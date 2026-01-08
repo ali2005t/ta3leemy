@@ -131,9 +131,10 @@ body {
     min-width: 0;
 }
 
-.top-bar {
+.top-bar,
+.top-bar-redesigned {
     height: var(--header-height);
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
@@ -143,6 +144,12 @@ body {
     position: sticky;
     top: 0;
     z-index: 900;
+    width: 100%;
+}
+
+.top-bar-redesigned {
+    background: #0f172a;
+    /* Explicit background from inline style */
 }
 
 .page-content {
@@ -319,6 +326,7 @@ body {
     margin-bottom: 1.5rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     flex: 1;

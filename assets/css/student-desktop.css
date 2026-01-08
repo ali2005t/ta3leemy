@@ -50,17 +50,23 @@
         box-shadow: -5px 0 20px rgba(0, 0, 0, 0.05);
         z-index: 2000;
 
-        /* OFF-CANVAS LOGIC */
-        transform: translateX(110%);
-        /* Hidden to the right */
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        opacity: 0;
+        /* PERSISTENT ON DESKTOP */
+        transform: translateX(0) !important;
+        opacity: 1 !important;
     }
 
-    /* When Active (Toggled) */
-    .bottom-nav.sidebar-open {
-        transform: translateX(0);
-        opacity: 1;
+    /* Shift Content Logic */
+    body {
+        padding-right: 300px;
+        /* Make space for sidebar */
+    }
+
+    .app-content {
+        max-width: 1200px !important;
+        margin: 0 auto !important;
+        padding-bottom: 2rem !important;
+        width: 100% !important;
+        /* Ensure it takes available space */
     }
 
     /* Nav Items Styling */
@@ -105,40 +111,8 @@
 
     /* --- Menu Toggle Button (Desktop Only) --- */
     #desktop-menu-btn {
-        display: flex !important;
-        /* Visible on Desktop */
-        position: fixed;
-        top: 2rem;
-        right: 2rem;
-        z-index: 2100;
-        /* Above Sidebar */
-        width: 50px;
-        height: 50px;
-        background: white;
-        border: 2px solid var(--app-primary, #6366f1); /* Brand Color Border */
-        border-radius: 12px;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        transition: all 0.2s;
-        color: var(--app-primary, #6366f1); /* Brand Color Icon */
-    }
-
-    #desktop-menu-btn:hover {
-        background: var(--app-primary, #6366f1);
-        color: white;
-        transform: scale(1.05);
-        box-shadow: 0 8px 15px rgba(99, 102, 241, 0.2);
-    }
-
-    #desktop-menu-btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    #desktop-menu-btn i {
-        font-size: 1.5rem;
+        display: none !important;
+        /* Hidden because sidebar is persistent */
     }
 
     /* --- Overlay Backdrop --- */
