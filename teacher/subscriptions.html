@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="icon" href="../assets/images/icon title  and logo .png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         .plan-card {
@@ -168,11 +169,13 @@
         <main class="main-content">
             <header class="top-bar-redesigned"
                 style="display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0f172a; border-bottom: 1px solid #1e293b;">
-                <div class="header-right">
+                <div class="header-right" style="display:flex; align-items:center; gap:10px;">
                     <button class="btn-icon mobile-only" id="open-sidebar"
                         style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer; margin-left:10px;"><i
                             class="fas fa-bars"></i></button>
-                    <h2 class="header-title">إدارة الاشتراكات</h2>
+                    <img src="../assets/images/icon title  and logo .png" alt="Logo"
+                        style="height:35px; border-radius:50%;">
+                    <h2 class="header-title" style="margin:0;">إدارة الاشتراكات</h2>
                 </div>
                 <div class="header-left">
 
@@ -186,6 +189,15 @@
                     style="background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #334155; margin-bottom: 30px;">
                     <div
                         style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
+                        <div class="header-title" style="display:flex; align-items:center; gap:10px;">
+                            <img src="../assets/images/icon title  and logo .png" alt="Logo"
+                                style="height:35px; border-radius:50%;">
+                            <div>
+                                <h3 style="margin:0; color:white; font-size:1.2rem;">الاشتراكات</h3>
+                                <p id="platform-name" style="margin:0; font-size:0.8rem; color:#94a3b8;">منصتي التعليمية
+                                </p>
+                            </div>
+                        </div>
                         <div>
                             <h4 style="margin:0 0 10px 0; color:#94a3b8;">باقتك الحالية</h4>
                             <h1 id="current-plan-name" style="margin:0; color:white; font-size:2rem;">جاري التحميل...
