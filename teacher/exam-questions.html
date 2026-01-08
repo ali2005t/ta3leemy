@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="stylesheet" href="../assets/css/exam-questions.css">
+    <link rel="icon" href="../assets/images/icon title  and logo .png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 </head>
@@ -19,22 +20,31 @@
         <aside class="sidebar" id="sidebar"></aside>
 
         <main class="main-content">
-            <header class="top-bar">
-                <div style="display:flex; align-items:center; gap:10px;">
+            <header class="top-bar-redesigned"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0f172a; border-bottom: 1px solid #1e293b;">
+                <div class="header-right" style="display:flex; align-items:center; gap:15px;">
                     <button class="btn-icon mobile-only" id="open-sidebar"
                         style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer;"><i
                             class="fas fa-bars"></i></button>
                     <button class="btn btn-secondary" onclick="window.location.href='exams.html'">
-                        <i class="fas fa-arrow-right"></i> عودة للتقييمات
+                        <i class="fas fa-arrow-right"></i> عودة
                     </button>
-                    <div>
-                        <h3 id="exam-title-header">أسئلة التقييم</h3>
-                        <div id="exam-stats" style="font-size:0.85rem; color:#64748b;">0 سؤال | المجموع: 0 درجة</div>
+                    <div class="header-title" style="display:flex; align-items:center; gap:10px;">
+                        <img src="../assets/images/icon title  and logo .png" alt="Logo"
+                            style="height:35px; border-radius:50%;">
+                        <div>
+                            <h3 id="exam-title-header" style="margin:0; color:white; font-size:1.2rem;">أسئلة التقييم
+                            </h3>
+                            <div id="exam-stats" style="font-size:0.8rem; color:#94a3b8;">0 سؤال | المجموع: 0 درجة</div>
+                        </div>
                     </div>
                 </div>
-                <button class="btn btn-primary" id="open-add-modal">
-                    <i class="fas fa-plus"></i> إضافة سؤال
-                </button>
+                <!-- Left: Actions -->
+                <div class="header-left">
+                    <button class="btn btn-primary" id="open-add-modal">
+                        <i class="fas fa-plus"></i> إضافة سؤال
+                    </button>
+                </div>
             </header>
 
             <div class="page-content">
