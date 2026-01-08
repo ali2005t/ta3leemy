@@ -9,8 +9,9 @@
     <script type="module" src="../assets/js/header-manager.js"></script>
     <script type="module" src="../assets/js/global-ui.js"></script>
 
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/dashboard-new.css">
+    <link rel="stylesheet" href="../assets/css/style.css?v=2">
+    <link rel="stylesheet" href="../assets/css/dashboard.css?v=2">
+    <link rel="stylesheet" href="../assets/css/dashboard-new.css?v=2">
     <link rel="icon" href="../assets/images/icon title  and logo .png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script type="module">
@@ -26,14 +27,19 @@
         <aside class="sidebar" id="sidebar"></aside>
 
         <main class="main-content">
-            <header class="top-bar">
-                <div style="display:flex; align-items:center; gap:10px;">
+            <header class="top-bar-redesigned">
+                <div class="header-right" style="display:flex; align-items:center; gap:15px;">
                     <button class="btn-icon mobile-only" id="open-sidebar"
                         style="background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer;"><i
                             class="fas fa-bars"></i></button>
-                    <img src="../assets/images/icon title  and logo .png" alt="Logo"
-                        style="height:35px; border-radius:50%;">
-                    <h3>إعدادات المنصة والتطبيق</h3>
+                    <div class="header-title" style="display:flex; align-items:center; gap:10px;">
+                        <img src="../assets/images/icon title  and logo .png" alt="Logo"
+                            style="height:35px; border-radius:50%;">
+                        <div>
+                            <h3 style="margin:0; color:white; font-size:1.2rem;">إعدادات المنصة</h3>
+                            <p id="platform-name" style="margin:0; font-size:0.8rem; color:#94a3b8;">منصتي التعليمية</p>
+                        </div>
+                    </div>
                 </div>
             </header>
 
