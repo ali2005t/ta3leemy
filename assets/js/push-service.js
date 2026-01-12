@@ -19,7 +19,7 @@ export const PushService = {
             const apiKey = data.oneSignalApiKey;
 
             if (!appId || !apiKey) {
-                console.warn(`Teacher ${teacherId} missing OneSignal keys`);
+                console.warn(`Teacher ${teacherId} missing OneSignal keys. Returning null.`);
                 return null;
             }
             return { appId, apiKey };

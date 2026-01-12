@@ -135,6 +135,7 @@
         import { collection, addDoc, query, where, getDocs, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { initHeader } from '../assets/js/header-manager.js';
         import { getEffectiveUserUid } from '../assets/js/impersonation-manager.js';
+        import { PushService } from '../assets/js/push-service.js';
 
         let currentUid = null;
 
@@ -247,7 +248,20 @@
                     isRead: false
                 });
 
-                alert('تم إرسال الإشعار بنجاح! 🚀');
+                // --- TRIGGER PUSH NOTIFICATION (BACKGROUND) ---
+                try {
+                    console.log("Triggering Push...");
+                    const pushResult = await PushService.sendToTeacherStudents(currentUid, title, body);
+                    if (!pushResult) {
+                        alert("تم الحفظ، ولكن لم يتم إرسال الإشعار للهواتف. تأكد من إدخال مفاتيح OneSignal في الإعدادات.");
+                    } else {
+                        alert('تم الحفظ وإرسال الإشعار بنجاح! 🚀');
+                    }
+                } catch (pushErr) {
+                    console.error("Push Failed:", pushErr);
+                }
+                // ----------------------------------------------
+
                 document.getElementById('notif-title').value = '';
                 document.getElementById('notif-body').value = '';
                 loadHistory();
