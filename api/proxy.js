@@ -41,7 +41,17 @@ export default async function handler(req, res) {
         const data = await response.json();
 
         // 5. Return the result
-        res.status(response.status).json(data);
+        // 5. Return the result
+        if (response.status !== 200) {
+            // DEBUG: Return what we sent to help diagnose
+            res.status(response.status).json({
+                ...data,
+                debug_used_token: token ? "Token Present (Starts with " + token.substring(0, 10) + ")" : "Token Missing/Undefined",
+                debug_received_query_key: auth_key ? "Yes" : "No"
+            });
+        } else {
+            res.status(response.status).json(data);
+        }
 
     } catch (error) {
         console.error("Proxy Error:", error);

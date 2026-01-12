@@ -126,9 +126,10 @@ export const PushService = {
             // Note: response.ok check might be needed if proxy fails, but .json() usually handles it
             const result = await response.json();
 
-            if (result.errors) {
-                console.error("Broadcast API Error:", result.errors);
-                return { success: false, error: JSON.stringify(result.errors) }; // Return fail details
+            if (result.errors || result.debug_used_token) {
+                console.error("Broadcast API Error:", result);
+                const debugMsg = result.debug_used_token ? `\n[Debug: ${result.debug_used_token}]` : "";
+                return { success: false, error: JSON.stringify(result.errors) + debugMsg };
             }
 
             console.log("Broadcast Push Result:", result);
