@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'config.dart';
-import 'webview_screen.dart';
+import 'splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +29,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppConfig.primaryColor),
         useMaterial3: true,
       ),
-      home: const WebViewScreen(), // الشاشة الرئيسية هي الـ WebView
+      home: const SplashScreen(), // الشاشة الرئيسية هي شاشة البداية
     );
   }
 }
