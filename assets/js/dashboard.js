@@ -71,8 +71,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateDashboardUI(data);
 
             } else {
-                console.error("No teacher profile found!");
-                // Optionally handle extended error (logout or contact support)
+                // Suppress error for Admins
+                const role = sessionStorage.getItem('role') || localStorage.getItem('role');
+                if (role !== 'admin') {
+                    console.warn("No teacher profile found for UID:", uid);
+                }
             }
         } catch (error) {
             console.error("Error fetching teacher data:", error);
