@@ -92,13 +92,46 @@ function initDesktopMenu() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     applyBranding();
     initDesktopMenu();
 
-    onAuthStateChanged(auth, (user) => {
+    // --- AUTO-RESTORE SESSION (Median Fix) ---
+    // If Auth state is taking too long or null, check local storage for credentials
+    // This fixes the "Logged out on App Restart" issue.
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
+            console.log("Auth State: Logged In", user.uid);
             initStudentNotifications(user.uid);
+        } else {
+            console.log("Auth State: Null. checking backup...");
+            const storedAuth = localStorage.getItem('median_auth_data');
+            if (storedAuth) {
+                try {
+                    const creds = JSON.parse(storedAuth);
+                    if (creds.email && creds.secret) {
+                        console.log("Attempting Silent Re-Login...");
+                        // Import SignIn dynamically or use global if available.
+                        // Since 'auth' is imported, we need signInWithEmailAndPassword
+                        const { signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
+
+                        await signInWithEmailAndPassword(auth, creds.email, atob(creds.secret));
+                        console.log("Silent Re-Login Successful!");
+                        // onAuthStateChanged will trigger again with 'user'
+                    }
+                } catch (e) {
+                    console.error("Silent Re-Login Failed", e);
+                }
+            } else {
+                console.log("No backup credentials found.");
+                // Optionally redirect to login?
+                // window.location.href = '../auth/login.html'; 
+                // But this file is common, might be used on public pages? 
+                // If it's the student app index, it has its own redirect checks?
+                // Actually student-home.js doesn't check auth.
+                // So we SHOULD probably redirect if this is a protected page.
+                // But let's be safe and let the page logic handle it specifically if it wants data.
+            }
         }
     });
 });

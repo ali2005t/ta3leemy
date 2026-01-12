@@ -248,10 +248,11 @@ export const GlobalUI = {
 
     // --- Desktop Sidebar Logic ---
     initDesktopSidebar() {
-        if (window.innerWidth > 1024) {
-            // ... existing desktop logic ...
-            // Keeping it simple or removing if not needed based on user request.
-            // User focused on Mobile/Tablet now.
+        // User Request: Sidebar should NOT be open by default on desktop (behaves like mobile)
+        const nav = document.querySelector('.bottom-nav'); // Sidebar container
+        if (nav) {
+            // Force closed on load
+            nav.classList.remove('sidebar-open');
         }
     }
 };
