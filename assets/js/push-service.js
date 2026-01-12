@@ -106,12 +106,12 @@ export const PushService = {
         };
 
         try {
-            // PROXY WORKAROUND: Force Proxy for ALL Browser Environments (Localhost & GitHub Pages)
-            // OneSignal REST API does not support client-side CORS directly.
-            const proxyUrl = "https://corsproxy.io/?";
+            // PROXY WORKAROUND: Switching to 'codetabs' for broadcast as well.
+            const proxyUrl = "https://api.codetabs.com/v1/proxy?quest=";
             const targetUrl = "https://onesignal.com/api/v1/notifications";
+            const finalUrl = proxyUrl + encodeURIComponent(targetUrl);
 
-            const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+            const response = await fetch(finalUrl, {
                 method: "POST",
                 headers: headers,
                 body: JSON.stringify(payload)
