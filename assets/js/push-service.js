@@ -60,10 +60,10 @@ export const PushService = {
         };
 
         try {
-            // PROXY WORKAROUND: Switching to 'thingproxy' which handles POST headers better than corsproxy.io
-            const proxyUrl = "https://thingproxy.freeboard.io/fetch/";
+            // PROXY WORKAROUND: Switching to 'codetabs' as ThingProxy strips Auth headers, and CorsProxy gave 403.
+            const proxyUrl = "https://api.codetabs.com/v1/proxy?quest=";
             const targetUrl = "https://onesignal.com/api/v1/notifications";
-            const finalUrl = proxyUrl + targetUrl;
+            const finalUrl = proxyUrl + encodeURIComponent(targetUrl);
 
             const response = await fetch(finalUrl, {
                 method: "POST",
