@@ -11,8 +11,7 @@ const firebaseConfig = {
     projectId: "eduhive-6db28",
     storageBucket: "eduhive-6db28.firebasestorage.app",
     messagingSenderId: "778043381002",
-    appId: "1:778043381002:web:f3c345c9c2f3d5eeb056f3",
-    measurementId: "G-5V7JHPNMS3"
+    appId: "1:778043381002:web:f3c345c9c2f3d5eeb056f3"
 };
 
 const app = initializeApp(firebaseConfig);

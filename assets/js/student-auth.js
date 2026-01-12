@@ -393,6 +393,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
 
+                // 3. Save Credentials for Silent Auto-Login (Median/WebView Fix)
+                try {
+                    const authData = {
+                        email: user.email, // Use authenticated email
+                        secret: btoa(password) // Simple encoding for auto-fill logic
+                    };
+                    localStorage.setItem('median_auth_data', JSON.stringify(authData));
+                    console.log("Login credentials saved for silent re-login.");
+                } catch (e) {
+                    console.error("Failed to save auth backup:", e);
+                }
+
                 // Redirect preserving context
                 window.location.href = `home.html${teacherId ? '?t=' + teacherId : ''}`;
 

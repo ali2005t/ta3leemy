@@ -305,21 +305,35 @@
                             <td style="font-weight:bold;">${data.title}</td>
                             <td>${data.body}</td>
                             <td>${date}</td>
-                            <td><span class="badge" style="background:#10b981; color:white; padding:2px 8px; border-radius:4px;">تم الإرسال</span></td>
+                            <td>
+                                <span class="badge" style="background:#10b981; color:white; padding:2px 8px; border-radius:4px;">تم الإرسال</span>
+                                <button onclick="deleteNotification('${doc.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer; margin-right:10px;" title="حذف">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
                 });
             } catch (e) {
-                console.error("Error loading history:", e); // Often index error if not created
-                // Fallback for no index
-                if (e.code === 'failed-precondition') {
-                    console.log("Needs index, trying without orderBy");
-                    // Simple fallback if index missing
-                    // ...
-                }
+                console.error("Error loading history:", e);
             }
         }
+
+        // Delete Logic
+        import { deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        window.deleteNotification = async (id) => {
+            if (!confirm("هل أنت متأكد من حذف هذا الإشعار من السجل؟")) return;
+            try {
+                await deleteDoc(doc(db, "notifications", id));
+                loadHistory(); // Refresh
+                // UIManager.showToast('تم الحذف بنجاح', 'success'); // If UIManager exists
+            } catch (e) {
+                console.error("Delete failed", e);
+                alert("فشل الحذف");
+            }
+        };
+
 
 
         // Scripts from global-ui handle toggles now.

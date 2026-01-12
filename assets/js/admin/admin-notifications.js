@@ -54,19 +54,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadHistory() {
         try {
-            const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"));
+            // Segregation: Only show Admin's own notifications
+            const q = query(collection(db, "notifications"), where("sender", "==", "admin"), orderBy("createdAt", "desc"));
             const snapshot = await getDocs(q);
 
             historyBody.innerHTML = '';
             loading.style.display = 'none';
 
             if (snapshot.empty) {
-                historyBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">لا توجد إشعارات مرسلة</td></tr>';
+                historyBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">لا توجد إشعارات مرسلة</td></tr>';
                 return;
             }
 
-            snapshot.forEach(doc => {
-                const data = doc.data();
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
                 const tr = document.createElement('tr');
 
                 let targetText = data.target;
@@ -81,6 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${(data.body || '').substring(0, 50)}${(data.body?.length > 50) ? '...' : ''}</td>
                     <td><span class="badge badge-info">${targetText}</span></td>
                     <td>${date}</td>
+                    <td>
+                        <button onclick="deleteAdminNotification('${docSnap.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer;" title="حذف">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 `;
                 historyBody.appendChild(tr);
             });
@@ -90,5 +96,25 @@ document.addEventListener('DOMContentLoaded', () => {
             loading.innerText = "خطأ في تحميل السجل";
         }
     }
+
+    // Expose Delete Function
+    import { deleteDoc, doc as firestoreDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    window.deleteAdminNotification = async (id) => {
+        if (!confirm("هل أنت متأكد من حذف هذا الإشعار؟")) return;
+        try {
+            await deleteDoc(firestoreDoc(db, "notifications", id));
+            // Reload manually or trigger
+            document.getElementById('notif-history-body').innerHTML = '';
+            // We need to re-call loadHistory, but it's inside scope.
+            // Better to just reload page or use event.
+            // For now, let's reload the simple way:
+            window.location.reload();
+        } catch (e) {
+            console.error(e);
+            alert("فشل الحذف");
+        }
+    };
+
+});
 
 });
