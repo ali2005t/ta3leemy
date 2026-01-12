@@ -96,9 +96,9 @@ export const PushService = {
         if (!keys) return { success: false, error: "Missing OneSignal Keys in Teacher Profile" };
 
         // DATA INTEGRITY CHECK:
-        // The user logs showed that 'keys.apiKey' contained a huge error message string!
-        // We must validate that the key looks like a real key.
-        if (keys.apiKey.length > 100 || keys.apiKey.includes("Failed to load") || keys.apiKey.includes("firebase")) {
+        // Adjusted to support new 'os_v2_app_' keys which are longer (~100 chars).
+        // We only reject if it looks like a clear error message.
+        if (keys.apiKey.length > 250 || keys.apiKey.includes("Failed to load") || keys.apiKey.includes("firebase")) {
             console.error("CRITICAL: Corrupt API Key detected:", keys.apiKey);
             return { success: false, error: "CORRUPT KEY: Your OneSignal API Key in your profile is invalid (it looks like an error message). Please go to Profile and update it with the correct key." };
         }
