@@ -164,11 +164,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (ticketSnap.exists()) {
                     const tData = ticketSnap.data();
                     if (tData.studentId) {
-                        PushService.sendToUsers(
-                            [tData.studentId],
-                            "رد جديد من الدعم 💬",
-                            `قام المعلم بالرد على تذكرتك: "${text.substring(0, 40)}..."`
-                        );
+                        if (tData.studentId) {
+                            // Pass Teacher ID first (currentUser.uid) to get Dynamic Keys
+                            PushService.sendToUsers(
+                                currentUser.uid, // <--- Added Teacher ID
+                                [tData.studentId],
+                                "رد جديد من الدعم 💬",
+                                `قام المعلم بالرد على تذكرتك: "${text.substring(0, 40)}..."`
+                            );
+                        }
                     }
                 }
             } catch (e) { console.warn("Push Failed", e); }

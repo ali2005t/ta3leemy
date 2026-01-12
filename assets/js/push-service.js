@@ -1,63 +1,68 @@
-
 // assets/js/push-service.js
-
-// CONFIGURATION
-const ONESIGNAL_APP_ID = "3dd814ae-df51-4396-8aca-0877931b7b5f";
-const ONESIGNAL_API_KEY = "os_v2_app_hxmbjlw7kfbzncwkbb3zgg33l44df4iw34se7xfnpoq3brk2p73te76zl5knyxz4keswlk5kw6cqae54ne5ivxtdhw3gvk7trt63zra";
+import { db } from './firebase-config.js';
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 export const PushService = {
 
     /**
-     * Send Notification to Specific Users by External ID (Firebase UID)
-     * @param {string[]} userIds - Array of Firebase UIDs
-     * @param {string} title - Notification Title
-     * @param {string} message - Notification Body
-     * @param {object} data - Custom data (e.g., { url: '...' })
+     * Helper: Fetch Teacher Credentials
+     * @param {string} teacherId 
      */
-    async sendToUsers(userIds, title, message, data = {}) {
+    async getTeacherKeys(teacherId) {
+        try {
+            if (!teacherId) throw new Error("Teacher ID missing");
+            const snap = await getDoc(doc(db, "teachers", teacherId));
+            if (!snap.exists()) throw new Error("Teacher not found");
+
+            const data = snap.data();
+            const appId = data.oneSignalAppId;
+            const apiKey = data.oneSignalApiKey;
+
+            if (!appId || !apiKey) {
+                console.warn(`Teacher ${teacherId} missing OneSignal keys`);
+                return null;
+            }
+            return { appId, apiKey };
+        } catch (e) {
+            console.error("Key Fetch Error:", e);
+            return null;
+        }
+    },
+
+    /**
+     * Send Notification to Specific Users (Student) of a specific Teacher
+     * @param {string} teacherId - REQUIRED to find which App to send from
+     * @param {string[]} userIds - Array of Firebase UIDs (Students)
+     * @param {string} title 
+     * @param {string} message 
+     * @param {object} data 
+     */
+    async sendToUsers(teacherId, userIds, title, message, data = {}) {
         if (!userIds || userIds.length === 0) return;
+
+        // 1. Get Keys
+        const keys = await this.getTeacherKeys(teacherId);
+        if (!keys) return; // Silent fail or throw
 
         const headers = {
             "Content-Type": "application/json; charset=utf-8",
-            "Authorization": `Basic ${ONESIGNAL_API_KEY}`
+            "Authorization": `Basic ${keys.apiKey}`
         };
 
         const payload = {
-            app_id: ONESIGNAL_APP_ID,
-            include_external_user_ids: userIds, // Legacy OneSignal
-            // For new OneSignal, might use filters on tags: 
-            // filters: [{ field: "tag", key: "firebase_uid", relation: "=", value: "UID" }] 
-            // BUT strict targeting by tag is safer given our setup.
-            filters: userIds.map(uid => ({ field: "tag", key: "firebase_uid", relation: "=", value: uid, operator: "OR" })),
+            app_id: keys.appId,
+            include_player_ids: [], // We use external_user_id (filters)
+
+            // TARGETING: Match 'firebase_uid' tag specific to this App ID
+            filters: userIds.map((uid, index) => {
+                const f = { field: "tag", key: "firebase_uid", relation: "=", value: uid };
+                return index === 0 ? f : [{ operator: "OR" }, f];
+            }).flat(),
 
             headings: { en: title, ar: title },
             contents: { en: message, ar: message },
             data: data
         };
-
-        // If simple array includes didn't work, we use the Tag Filter logic above.
-        // Let's refine the filter construction:
-        /*
-        filters: [
-            { field: "tag", key: "firebase_uid", relation: "=", value: "UID1" },
-            { operator: "OR" },
-            { field: "tag", key: "firebase_uid", relation: "=", value: "UID2" }
-        ]
-        */
-
-        // Single user optimization
-        if (userIds.length === 1) {
-            payload.filters = [{ field: "tag", key: "firebase_uid", relation: "=", value: userIds[0] }];
-        } else {
-            // Construct OR chain
-            let filters = [];
-            userIds.forEach((uid, index) => {
-                if (index > 0) filters.push({ operator: "OR" });
-                filters.push({ field: "tag", key: "firebase_uid", relation: "=", value: uid });
-            });
-            payload.filters = filters;
-        }
-
 
         try {
             const response = await fetch("https://onesignal.com/api/v1/notifications", {
@@ -75,22 +80,26 @@ export const PushService = {
     },
 
     /**
-     * Send Notification to All Students of a Teacher
-     * @param {string} teacherId - The Teacher's ID
+     * Broadcast to ALL Students of a Teacher
+     * @param {string} teacherId 
      * @param {string} title 
      * @param {string} message 
      */
     async sendToTeacherStudents(teacherId, title, message) {
+        // 1. Get Keys
+        const keys = await this.getTeacherKeys(teacherId);
+        if (!keys) return;
+
         const headers = {
             "Content-Type": "application/json; charset=utf-8",
-            "Authorization": `Basic ${ONESIGNAL_API_KEY}`
+            "Authorization": `Basic ${keys.apiKey}`
         };
 
         const payload = {
-            app_id: ONESIGNAL_APP_ID,
+            app_id: keys.appId,
+            // Tag filter: 'role' is 'student' (Simple broadcast for this App ID)
+            // Since this App ID is EXCLUSIVE to this teacher, we just target all users with tag role=student
             filters: [
-                { field: "tag", key: "teacher_context", relation: "=", value: teacherId },
-                { operator: "AND" },
                 { field: "tag", key: "role", relation: "=", value: "student" }
             ],
             headings: { en: title, ar: title },
