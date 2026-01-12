@@ -1,6 +1,6 @@
 // login.js - Secure Login Logic with Verification Check
 import { auth, db } from './firebase-config.js';
-import { signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { signInWithEmailAndPassword, signOut, sendEmailVerification, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -79,7 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 // --------------------------
 
-                // 1. Attempt Sign In
+                // 1. Enforce Persistence & Attempt Sign In
+                await setPersistence(auth, browserLocalPersistence);
                 const userCredential = await signInWithEmailAndPassword(auth, identifier, password);
                 const user = userCredential.user;
 
