@@ -252,13 +252,17 @@
                 try {
                     console.log("Triggering Push...");
                     const pushResult = await PushService.sendToTeacherStudents(currentUid, title, body);
-                    if (!pushResult) {
-                        alert("تم الحفظ، ولكن لم يتم إرسال الإشعار للهواتف. تأكد من إدخال مفاتيح OneSignal في الإعدادات.");
+
+                    if (!pushResult || !pushResult.success) {
+                        const err = pushResult?.error || 'Unknown Error';
+                        alert("تم الحفظ، ولكن فشل الإشعار: " + err);
                     } else {
                         alert('تم الحفظ وإرسال الإشعار بنجاح! 🚀');
                     }
+
                 } catch (pushErr) {
                     console.error("Push Failed:", pushErr);
+                    alert("خطأ غير متوقع: " + pushErr.message);
                 }
                 // ----------------------------------------------
 
