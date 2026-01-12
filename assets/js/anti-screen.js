@@ -10,14 +10,25 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Median/GoNative System-Level Protection (The Real Fix)
-    if (navigator.userAgent.indexOf('gonative') > -1 || window.gonative) {
-        // Wait for bridge if needed? usually instant in window.gonative
-        if (window.gonative && window.gonative.privacy) {
-            window.gonative.privacy.set({ enabled: true });
-        } else {
-            window.location.href = 'gonative://privacy/set?enabled=true';
+    // REQUIRES: Median "Screen Security" Plugin (Enterprise)
+    function enableMedianSecurity() {
+        if (navigator.userAgent.indexOf('gonative') > -1) {
+
+            // New API (median.secureScreen)
+            if (window.median && window.median.secureScreen) {
+                window.median.secureScreen.set({ secure: true });
+            }
+            // Legacy API (gonative.privacy - unlikely to work for screen block, but kept)
+            else if (window.gonative && window.gonative.privacy) {
+                window.gonative.privacy.set({ enabled: true });
+            }
+            // URL Scheme Fallback
+            else {
+                window.location.href = 'median://secureScreen/set?secure=true';
+            }
         }
     }
+    enableMedianSecurity();
 
     // 2. CSS Blur Overlay (For Web/Browser Fallback)
     const overlay = document.createElement('div');
