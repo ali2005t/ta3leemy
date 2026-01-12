@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-    // 1. Enable CORS (Allow requests from your website)
+    // 1. Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -12,22 +12,32 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { target } = req.query; // e.g., ?target=https://onesignal.com/api/v1/notifications
+        const { target } = req.query;
 
         if (!target) {
             return res.status(400).json({ error: "Missing 'target' query parameter" });
         }
 
-        // 3. Forward the request to the real server (OneSignal)
+        // 3. Construct Headers for the Outgoing Request
+        // Node.js http request headers are lower-case.
+        const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+        const contentType = req.headers['content-type'] || 'application/json';
+
+        const outputHeaders = {
+            'Content-Type': contentType,
+            'Authorization': authHeader // Forward the key securely
+        };
+
+        // 4. Forward to OneSignal
         const response = await fetch(target, {
             method: req.method,
-            headers: req.headers, // Pass through Auth headers
+            headers: outputHeaders,
             body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
         });
 
         const data = await response.json();
 
-        // 4. Return the result back to the browser
+        // 5. Return the result
         res.status(response.status).json(data);
 
     } catch (error) {
