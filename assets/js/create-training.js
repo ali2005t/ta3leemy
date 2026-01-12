@@ -2,13 +2,12 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 // UIManager assumed global
 import { getEffectiveUserUid } from './impersonation-manager.js';
-import {
-    collection,
-    addDoc,
+addDoc,
     doc,
     getDoc,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { PushService } from './push-service.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -82,6 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             window.location.href = 'trainings.html';
+
+            // Push Notification
+            try {
+                await PushService.sendToTeacherStudents(currentUserId, "دورة جديدة 🎓", `تم إضافة دورة جديدة: "${title}". اشترك الآن!`);
+            } catch (e) {
+                console.error("Push Error", e);
+            }
 
         } catch (error) {
             console.error("Error creating training:", error);
