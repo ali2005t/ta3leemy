@@ -8,11 +8,11 @@ import 'dart:ui';
 class AppConfig {
   
   // 1. 📛 اسم التطبيق (بيظهر في بعض التنبيهات)
-  static const String appName = "ياضيات";
+  static const String appName = "sero";
 
   // 2. 🔗 رابط المنصة الخاص بالمدرس
   // ضع الرابط الذي يفتح عليه التطبيق أول ما يشتغل
-  static const String startUrl = "https://ta3leemy.com/teacher/ahmed-math";
+  static const String startUrl = "https://ta3leemy.vercel.app/student-app/login.html#/sero";
 
   // 3. 🎨 اللون الأساسي للتطبيق
   // (يستخدم في شاشة التحميل والشرائط العلوية)
