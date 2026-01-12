@@ -1,68 +1,79 @@
-import { auth, db } from '../firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { collection, addDoc, query, orderBy, getDocs, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db } from '../firebase-config.js';
+import { collection, addDoc, query, where, orderBy, getDocs, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { PushService } from '../push-service.js?v=5.0';
 
-document.addEventListener('DOMContentLoaded', () => {
-
+document.addEventListener('DOMContentLoaded', async () => {
+    // Elements
     const form = document.getElementById('send-notif-form');
     const historyBody = document.getElementById('notif-history-body');
     const loading = document.getElementById('loading-indicator');
-    const sendBtn = document.getElementById('send-btn');
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            // Check Admin Role (Simplified: Assume Admin Page Access Control)
-            loadHistory();
-        } else {
-            window.location.href = '../auth/login.html';
-        }
-    });
+    // 1. Send Notification
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('send-btn');
+            const originalText = btn.innerHTML;
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+            const target = document.getElementById('target-audience').value;
+            const title = document.getElementById('notif-title').value;
+            const body = document.getElementById('notif-body').value;
 
-        const target = document.getElementById('target-audience').value;
-        const title = document.getElementById('notif-title').value;
-        const body = document.getElementById('notif-body').value;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
 
-        if (!title || !body) return;
+            try {
+                // A. Save to Firestore
+                await addDoc(collection(db, "notifications"), {
+                    target: target,
+                    title: title,
+                    body: body,
+                    createdAt: serverTimestamp(),
+                    sender: "admin" // Critical for Segregation
+                });
 
-        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
-        sendBtn.disabled = true;
+                // B. Trigger Push (OneSignal)
+                // Filter users based on target? PushService needs to handle segments.
+                // providing 'target' to PushService or handling it here.
+                // simpler implementation for now:
+                if (target === 'all') await PushService.sendToAll(title, body);
+                else if (target === 'all_teachers') await PushService.sendToAllTeachers(title, body);
+                else if (target === 'all_students') await PushService.sendToAll(title, body); // Adjusted as needed
 
-        try {
-            await addDoc(collection(db, "notifications"), {
-                target: target,
-                title: title,
-                body: body,
-                createdAt: serverTimestamp(),
-                sender: "admin"
-            });
+                alert("✅ تم الإرسال بنجاح!");
+                form.reset();
+                loadHistory(); // Refresh table
 
-            alert("تم إرسال الإشعار بنجاح");
-            form.reset();
-            loadHistory(); // Refresh table
+            } catch (error) {
+                console.error("Send Error:", error);
+                alert("❌ حدث خطأ أثناء الإرسال");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+    }
 
-        } catch (e) {
-            console.error("Error sending notification", e);
-            alert("حدث خطأ أثناء الإرسال");
-        } finally {
-            sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال الآن';
-            sendBtn.disabled = false;
-        }
-    });
-
+    // 2. Load History (Segregated: Sender == Admin)
     async function loadHistory() {
-        try {
-            // Segregation: Only show Admin's own notifications
-            const q = query(collection(db, "notifications"), where("sender", "==", "admin"), orderBy("createdAt", "desc"));
-            const snapshot = await getDocs(q);
+        if (!historyBody) return;
 
+        try {
+            loading.style.display = 'block';
             historyBody.innerHTML = '';
+
+            // Query: Only fetch reports sent by 'admin'
+            const q = query(
+                collection(db, "notifications"),
+                where("sender", "==", "admin"),
+                orderBy("createdAt", "desc")
+            );
+
+            const snapshot = await getDocs(q);
             loading.style.display = 'none';
 
             if (snapshot.empty) {
-                historyBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">لا توجد إشعارات مرسلة</td></tr>';
+                historyBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#94a3b8;">لا توجد إشعارات سابقة</td></tr>';
                 return;
             }
 
@@ -70,20 +81,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = docSnap.data();
                 const tr = document.createElement('tr');
 
+                // Map Target to Readable
                 let targetText = data.target;
                 if (targetText === 'all') targetText = 'الكل';
-                if (targetText === 'all_teachers') targetText = 'المعلمين';
-                if (targetText === 'all_students') targetText = 'الطلاب';
+                else if (targetText === 'all_teachers') targetText = 'المعلمين';
+                else if (targetText === 'all_students') targetText = 'الطلاب';
 
                 const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleString('ar-EG') : '-';
 
                 tr.innerHTML = `
-                    <td>${data.title}</td>
-                    <td>${(data.body || '').substring(0, 50)}${(data.body?.length > 50) ? '...' : ''}</td>
-                    <td><span class="badge badge-info">${targetText}</span></td>
-                    <td>${date}</td>
+                    <td style="font-weight:bold; color:white;">${data.title}</td>
+                    <td style="color:#cbd5e1;">${(data.body || '').substring(0, 50)}${(data.body?.length > 50) ? '...' : ''}</td>
+                    <td><span class="badge" style="background:#3b82f6; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem;">${targetText}</span></td>
+                    <td style="color:#94a3b8; font-size:0.9rem;">${date}</td>
                     <td>
-                        <button onclick="deleteAdminNotification('${docSnap.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer;" title="حذف">
+                        <button onclick="window.deleteAdminNotification('${docSnap.id}')" 
+                                style="background:rgba(239, 68, 68, 0.1); border:1px solid #ef4444; color:#ef4444; width:32px; height:32px; border-radius:6px; cursor:pointer; transition:all 0.2s;" 
+                                title="حذف"
+                                onmouseover="this.style.background='#ef4444'; this.style.color='white'"
+                                onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.color='#ef4444'">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -92,29 +108,25 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
         } catch (e) {
-            console.error("Load history error", e);
-            loading.innerText = "خطأ في تحميل السجل";
+            console.error("History Load Error:", e);
+            loading.style.display = 'none';
+            historyBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#ef4444;">فشل تحميل السجل. تأكد من الفهرس (Index) في Firebase Console.</td></tr>';
         }
     }
 
-    // Expose Delete Function
-    import { deleteDoc, doc as firestoreDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    // 3. Expose Delete Function globally
     window.deleteAdminNotification = async (id) => {
         if (!confirm("هل أنت متأكد من حذف هذا الإشعار؟")) return;
         try {
-            await deleteDoc(firestoreDoc(db, "notifications", id));
-            // Reload manually or trigger
-            document.getElementById('notif-history-body').innerHTML = '';
-            // We need to re-call loadHistory, but it's inside scope.
-            // Better to just reload page or use event.
-            // For now, let's reload the simple way:
-            window.location.reload();
+            await deleteDoc(doc(db, "notifications", id));
+            await loadHistory(); // Reload table safely
         } catch (e) {
             console.error(e);
             alert("فشل الحذف");
         }
     };
 
-});
+    // Initial Load
+    loadHistory();
 
 });
