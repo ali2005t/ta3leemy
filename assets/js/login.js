@@ -84,6 +84,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userCredential = await signInWithEmailAndPassword(auth, identifier, password);
                 const user = userCredential.user;
 
+                // --- MEDIAN APP PERSISTENCE FIX ---
+                // Manually save session marker for WebView restoration
+                const sessionData = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    token: await user.getIdToken(), // Short-lived, but useful for init checks
+                    lastLogin: new Date().getTime()
+                };
+                localStorage.setItem('median_session', JSON.stringify(sessionData));
+                localStorage.setItem('median_user_uid', user.uid); // Quick lookup
+                // ----------------------------------
+
                 // 2. Check if Email is Verified (Skip for Admins to avoid checkout, but Plan says 'exempt admins')
                 // Let's first check verification status.
                 if (!user.emailVerified) {

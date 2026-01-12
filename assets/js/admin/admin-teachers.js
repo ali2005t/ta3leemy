@@ -536,6 +536,10 @@ window.openViewProfileModal = async (tid) => {
                 document.getElementById('vp-password').innerText = 'مشفر (Secure)';
             }
 
+            // Populate OneSignal
+            document.getElementById('vp-onesignal-app-id').value = data.oneSignalAppId || '';
+            document.getElementById('vp-onesignal-api-key').value = data.oneSignalApiKey || '';
+
             // Student App Link Construction
             const absoluteBase = new URL('../student-app/index.html', window.location.href).href;
             let finalLink = absoluteBase;
@@ -601,6 +605,31 @@ window.openViewProfileModal = async (tid) => {
             getDocs(countQ).then(snap => {
                 document.getElementById('vp-referral-count').innerText = snap.size + " معلم";
             });
+
+            // E. OneSignal Save Logic
+            const saveNotifBtn = document.getElementById('vp-save-notifications-btn');
+            // Remove old listener if any (simplest way is cloning/replacing node, but here we can just overwrite onclick)
+            saveNotifBtn.onclick = async () => {
+                const appId = document.getElementById('vp-onesignal-app-id').value.trim();
+                const apiKey = document.getElementById('vp-onesignal-api-key').value.trim();
+
+                saveNotifBtn.disabled = true;
+                saveNotifBtn.innerText = 'جاري الحفظ...';
+
+                try {
+                    await updateDoc(doc(db, "teachers", tid), {
+                        oneSignalAppId: appId,
+                        oneSignalApiKey: apiKey
+                    });
+                    UIManager.showToast('تم حفظ إعدادات الإشعارات بنجاح');
+                } catch (e) {
+                    console.error("Save Notif Error", e);
+                    UIManager.showToast('خطأ في الحفظ', 'error');
+                } finally {
+                    saveNotifBtn.disabled = false;
+                    saveNotifBtn.innerText = 'حفظ إعدادات الإشعارات';
+                }
+            };
 
         } else {
             document.getElementById('vp-name').innerText = 'معلم غير موجود';
