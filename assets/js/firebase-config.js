@@ -16,7 +16,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
+// const analytics = getAnalytics(app); // Disabled to prevent 404 errors (User request) Init (Prevents 404 on Localhost)
 // Safe Analytics Init (Prevents 404 on Localhost)
 let analytics;
 try {
