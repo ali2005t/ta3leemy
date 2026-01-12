@@ -158,25 +158,33 @@ function showToast(title, body) {
 
 // --- MEDIAN.CO / ONESIGNAL INTEGRATION ---
 function registerOneSignalTags(uid) {
-    // Check if running inside Median App
+    const tags = {
+        'firebase_uid': uid,
+        'role': 'student',
+        'teacher_context': sessionStorage.getItem('currentTeacherId') || 'global'
+    };
+
+    // 1. MEDIAN (GoNative) App
     if (navigator.userAgent.indexOf('gonative') > -1 || window.gonative) {
-
-        const tags = {
-            'firebase_uid': uid,
-            'role': 'student',
-            // Save TeacherContext to allow Multi-Tenant targeting if needed later
-            'teacher_context': sessionStorage.getItem('currentTeacherId') || 'global'
-        };
-
-        console.log("Attempting to Register Push Tags:", tags);
-
-        // Try JS Bridge Object
+        console.log("Registering Native Tags:", tags);
         if (window.gonative && window.gonative.onesignal) {
             window.gonative.onesignal.tags.set(tags);
-        }
-        // Try Legacy/Url Scheme Bridge
-        else {
+        } else {
             window.location.href = 'gonative://onesignal/tags/set?tags=' + encodeURIComponent(JSON.stringify(tags));
         }
+    }
+    // 2. WEB SDK (Browsers)
+    else {
+        // Ensure OneSignalDeferred is available
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        window.OneSignalDeferred.push(function (OneSignal) {
+            console.log("Registering Web Tags:", tags);
+            // Check for v16 User Namespace or fallback
+            if (OneSignal.User && OneSignal.User.addTags) {
+                OneSignal.User.addTags(tags);
+            } else if (OneSignal.sendTags) {
+                OneSignal.sendTags(tags);
+            }
+        });
     }
 }
