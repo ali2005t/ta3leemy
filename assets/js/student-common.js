@@ -23,18 +23,46 @@ window.OneSignalDeferred.push(async function (OneSignal) {
 
     // EXPLICIT PERMISSION REQUEST
     console.log("Requesting Permission...");
-    if (OneSignal.Notifications) {
-        // Modern SDK
-        OneSignal.Notifications.requestPermission();
 
-        // Show Banner if not granted
-        if (OneSignal.Notifications.permission !== "granted") {
-            showNotificationBanner(OneSignal);
+    // DEBUG: Force Button to check Median Status
+    const debugBtn = document.createElement('button');
+    debugBtn.innerText = "🔧 إعدادات الإشعارات (اضغط هنا)";
+    debugBtn.style.cssText = "position:fixed; bottom:80px; left:20px; z-index:99999; background:red; color:white; padding:10px; border-radius:5px;";
+    debugBtn.onclick = function () {
+        alert("UA: " + navigator.userAgent);
+        if (window.gonative) {
+            alert("GoNative JS Found! Registering...");
+            if (window.gonative.onesignal) window.gonative.onesignal.register();
+            else window.location.href = 'gonative://onesignal/register';
+        } else {
+            alert("Not Native App? Trying Protocol...");
+            window.location.href = 'gonative://onesignal/register';
         }
-    } else {
-        // Legacy
-        OneSignal.showNativePrompt();
+    };
+    document.body.appendChild(debugBtn);
+
+    // 1. Median/GoNative Usage
+    // 1. Median/GoNative Usage
+    if (navigator.userAgent.indexOf('gonative') > -1 || window.gonative) {
+        console.log("Median App Detected: Triggering Native Registration");
+        if (window.gonative && window.gonative.onesignal) {
+            window.gonative.onesignal.register();
+        } else {
+            window.location.href = 'gonative://onesignal/register';
+        }
     }
+    // 2. Standard Browser Usage
+    // Modern SDK
+    OneSignal.Notifications.requestPermission();
+
+    // Show Banner if not granted
+    if (OneSignal.Notifications.permission !== "granted") {
+        showNotificationBanner(OneSignal);
+    }
+} else {
+    // Legacy
+    OneSignal.showNativePrompt();
+}
 });
 
 function showNotificationBanner(OneSignal) {
