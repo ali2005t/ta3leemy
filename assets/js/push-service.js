@@ -93,7 +93,15 @@ export const PushService = {
     async sendToTeacherStudents(teacherId, title, message) {
         // 1. Get Keys
         const keys = await this.getTeacherKeys(teacherId);
-        if (!keys) return { success: false, error: "Missing OneSignal Keys" };
+        if (!keys) return { success: false, error: "Missing OneSignal Keys in Teacher Profile" };
+
+        // DATA INTEGRITY CHECK:
+        // The user logs showed that 'keys.apiKey' contained a huge error message string!
+        // We must validate that the key looks like a real key.
+        if (keys.apiKey.length > 100 || keys.apiKey.includes("Failed to load") || keys.apiKey.includes("firebase")) {
+            console.error("CRITICAL: Corrupt API Key detected:", keys.apiKey);
+            return { success: false, error: "CORRUPT KEY: Your OneSignal API Key in your profile is invalid (it looks like an error message). Please go to Profile and update it with the correct key." };
+        }
 
         const headers = {
             "Content-Type": "application/json; charset=utf-8"
