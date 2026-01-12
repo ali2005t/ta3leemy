@@ -182,6 +182,16 @@ function registerOneSignalTags(uid) {
             // Check for v16 User Namespace or fallback
             if (OneSignal.User && OneSignal.User.addTags) {
                 OneSignal.User.addTags(tags);
+                // VISUAL CONFIRMATION FOR USER
+                console.log("✅ Tags Sent to OneSignal");
+                if (!sessionStorage.getItem('notif_toast_shown')) {
+                    const toast = document.createElement('div');
+                    toast.innerText = "🔔 تم تفعيل الإشعارات لهذا الجهاز بنجاح!";
+                    toast.style.cssText = "position:fixed; top:20px; right:20px; background:#10b981; color:white; padding:15px; z-index:99999; border-radius:8px; font-family:sans-serif;";
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 5000);
+                    sessionStorage.setItem('notif_toast_shown', 'true');
+                }
             } else if (OneSignal.sendTags) {
                 OneSignal.sendTags(tags);
             }
