@@ -9,8 +9,8 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/fi
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 window.OneSignalDeferred.push(async function (OneSignal) {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        console.warn('OneSignal disabled on localhost to prevent errors.');
-        return;
+        console.warn('OneSignal: Running on Localhost. Ensure you allow notifications.');
+        // We do NOT return here anymore; we allow it to try init.
     }
     // Only init if not already initialized
     if (!OneSignal.initialized) {
