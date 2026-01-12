@@ -60,7 +60,11 @@ export const PushService = {
         };
 
         try {
-            const response = await fetch("https://onesignal.com/api/v1/notifications", {
+            // PROXY WORKAROUND
+            const proxyUrl = "https://corsproxy.io/?";
+            const targetUrl = "https://onesignal.com/api/v1/notifications";
+
+            const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
                 method: "POST",
                 headers: headers,
                 body: JSON.stringify(payload)
@@ -101,11 +105,18 @@ export const PushService = {
         };
 
         try {
-            const response = await fetch("https://onesignal.com/api/v1/notifications", {
+            // PROXY WORKAROUND: Force Proxy for ALL Browser Environments (Localhost & GitHub Pages)
+            // OneSignal REST API does not support client-side CORS directly.
+            const proxyUrl = "https://corsproxy.io/?";
+            const targetUrl = "https://onesignal.com/api/v1/notifications";
+
+            const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
                 method: "POST",
                 headers: headers,
                 body: JSON.stringify(payload)
             });
+
+            // Note: response.ok check might be needed if proxy fails, but .json() usually handles it
             const result = await response.json();
 
             if (result.errors) {
