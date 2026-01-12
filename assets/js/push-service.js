@@ -60,76 +60,78 @@ export const PushService = {
         };
 
         try {
-            // PROXY WORKAROUND
-            const proxyUrl = "https://corsproxy.io/?";
-            const targetUrl = "https://onesignal.com/api/v1/notifications";
+            try {
+                // PROXY WORKAROUND
+                const proxyUrl = "https://thingproxy.freeboard.io/fetch/";
+                const targetUrl = "https://onesignal.com/api/v1/notifications";
+                const finalUrl = proxyUrl + targetUrl;
 
-            const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
-                method: "POST",
-                headers: headers,
-                body: JSON.stringify(payload)
-            });
-            const result = await response.json();
+                const response = await fetch(finalUrl, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
 
-            if (result.errors) {
-                console.error("Push API Error:", result.errors);
-                return { success: false, error: JSON.stringify(result.errors) };
+                if (result.errors) {
+                    console.error("Push API Error:", result.errors);
+                    return { success: false, error: JSON.stringify(result.errors) };
+                }
+
+                console.log("Push Result:", result);
+                return { success: true, result };
+
+            } catch (error) {
+                console.error("Push Network Error:", error);
+                return { success: false, error: error.message };
             }
-
-            console.log("Push Result:", result);
-            return { success: true, result };
-
-        } catch (error) {
-            console.error("Push Network Error:", error);
-            return { success: false, error: error.message };
-        }
-    },
+        },
 
     async sendToTeacherStudents(teacherId, title, message) {
-        // 1. Get Keys
-        const keys = await this.getTeacherKeys(teacherId);
-        if (!keys) return { success: false, error: "Missing OneSignal Keys" };
+            // 1. Get Keys
+            const keys = await this.getTeacherKeys(teacherId);
+            if (!keys) return { success: false, error: "Missing OneSignal Keys" };
 
-        const headers = {
-            "Content-Type": "application/json; charset=utf-8",
-            "Authorization": `Basic ${keys.apiKey}`
-        };
+            const headers = {
+                "Content-Type": "application/json; charset=utf-8",
+                "Authorization": `Basic ${keys.apiKey}`
+            };
 
-        const payload = {
-            app_id: keys.appId,
-            filters: [
-                { field: "tag", key: "role", relation: "=", value: "student" } // Broadcast to all students of this APP
-            ],
-            headings: { en: title, ar: title },
-            contents: { en: message, ar: message }
-        };
+            const payload = {
+                app_id: keys.appId,
+                filters: [
+                    { field: "tag", key: "role", relation: "=", value: "student" } // Broadcast to all students of this APP
+                ],
+                headings: { en: title, ar: title },
+                contents: { en: message, ar: message }
+            };
 
-        try {
-            // PROXY WORKAROUND: Force Proxy for ALL Browser Environments (Localhost & GitHub Pages)
-            // OneSignal REST API does not support client-side CORS directly.
-            const proxyUrl = "https://corsproxy.io/?";
-            const targetUrl = "https://onesignal.com/api/v1/notifications";
+            try {
+                // PROXY WORKAROUND: Force Proxy for ALL Browser Environments (Localhost & GitHub Pages)
+                // OneSignal REST API does not support client-side CORS directly.
+                const proxyUrl = "https://corsproxy.io/?";
+                const targetUrl = "https://onesignal.com/api/v1/notifications";
 
-            const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
-                method: "POST",
-                headers: headers,
-                body: JSON.stringify(payload)
-            });
+                const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
 
-            // Note: response.ok check might be needed if proxy fails, but .json() usually handles it
-            const result = await response.json();
+                // Note: response.ok check might be needed if proxy fails, but .json() usually handles it
+                const result = await response.json();
 
-            if (result.errors) {
-                console.error("Broadcast API Error:", result.errors);
-                return { success: false, error: JSON.stringify(result.errors) }; // Return fail details
+                if (result.errors) {
+                    console.error("Broadcast API Error:", result.errors);
+                    return { success: false, error: JSON.stringify(result.errors) }; // Return fail details
+                }
+
+                console.log("Broadcast Push Result:", result);
+                return { success: true, result };
+
+            } catch (error) {
+                console.error("Broadcast Push Network Error:", error);
+                return { success: false, error: error.message };
             }
-
-            console.log("Broadcast Push Result:", result);
-            return { success: true, result };
-
-        } catch (error) {
-            console.error("Broadcast Push Network Error:", error);
-            return { success: false, error: error.message };
         }
-    }
-};
+    };
