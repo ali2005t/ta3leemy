@@ -17,10 +17,43 @@ window.OneSignalDeferred.push(async function (OneSignal) {
         await OneSignal.init({
             appId: "3dd814ae-df51-4396-8aca-0877931b7b5f", // Replace with your App ID
             safari_web_id: "web.onesignal.auto.xxxxx",
-            notifyButton: { enable: true }
+            // notifyButton: { enable: true } // We will make our own custom UI
         });
     }
+
+    // EXPLICIT PERMISSION REQUEST
+    console.log("Requesting Permission...");
+    if (OneSignal.Notifications) {
+        // Modern SDK
+        OneSignal.Notifications.requestPermission();
+
+        // Show Banner if not granted
+        if (OneSignal.Notifications.permission !== "granted") {
+            showNotificationBanner(OneSignal);
+        }
+    } else {
+        // Legacy
+        OneSignal.showNativePrompt();
+    }
 });
+
+function showNotificationBanner(OneSignal) {
+    const banner = document.createElement('div');
+    banner.style.cssText = "position:fixed; bottom:0; left:0; width:100%; background:#6366f1; color:white; padding:15px; text-align:center; z-index:99999; box-shadow:0 -2px 10px rgba(0,0,0,0.2); display:flex; justify-content:center; align-items:center; gap:10px;";
+    banner.innerHTML = `
+        <span>🔔 لكي تصلك محاضراتك، يجب تفعيل الإشعارات.</span>
+        <button id="enable-notif-btn" style="background:white; color:#6366f1; border:none; padding:5px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">تفعيل الآن</button>
+    `;
+    document.body.appendChild(banner);
+
+    document.getElementById('enable-notif-btn').addEventListener('click', async () => {
+        await OneSignal.Notifications.requestPermission();
+        if (OneSignal.Notifications.permission === "granted") {
+            banner.remove();
+            alert("تم التفعيل بنجاح! شكراً لك.");
+        }
+    });
+}
 
 // 2. Apply Branding from Session Storage
 // This ensures sub-pages (Profile, Courses) still look like the Teacher's App

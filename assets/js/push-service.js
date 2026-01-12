@@ -135,7 +135,7 @@ export const PushService = {
             const result = await response.json();
 
             if (result.errors || result.debug_used_token) {
-                console.error("Broadcast API Error:", result);
+                console.error("Broadcast API Error:", JSON.stringify(result, null, 2)); // Stringify for readability
                 const debugMsg = result.debug_used_token ? `\n[Debug: ${result.debug_used_token}]` : "";
                 return { success: false, error: JSON.stringify(result.errors) + debugMsg };
             }
