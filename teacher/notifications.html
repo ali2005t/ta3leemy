@@ -101,7 +101,13 @@
                     <div class="content-card">
                         <div class="card-header"
                             style="padding:1.5rem; border-bottom:1px solid rgba(255,255,255,0.05);">
-                            <h3 style="margin:0;">سجل الإشعارات المرسلة</h3>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <h3 style="margin:0;">سجل الإشعارات المرسلة</h3>
+                                <button id="teacher-delete-all-btn" onclick="deleteAllNotifications()"
+                                    style="display:none; background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-size:0.9rem;">
+                                    <i class="fas fa-trash-alt"></i> حذف الكل
+                                </button>
+                            </div>
                         </div>
                         <div class="table-container">
                             <table class="data-table">
@@ -289,12 +295,17 @@
                 );
                 const snap = await getDocs(q);
                 const tbody = document.getElementById('history-list');
+                const deleteAllBtn = document.getElementById('teacher-delete-all-btn');
+
                 tbody.innerHTML = '';
 
                 if (snap.empty) {
                     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">لا توجد إشعارات سابقة</td></tr>';
+                    if (deleteAllBtn) deleteAllBtn.style.display = 'none';
                     return;
                 }
+
+                if (deleteAllBtn) deleteAllBtn.style.display = 'block';
 
                 snap.forEach(doc => {
                     const data = doc.data();
@@ -322,15 +333,44 @@
 
         // Delete Logic
         import { deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
         window.deleteNotification = async (id) => {
             if (!confirm("هل أنت متأكد من حذف هذا الإشعار من السجل؟")) return;
             try {
                 await deleteDoc(doc(db, "notifications", id));
                 loadHistory(); // Refresh
-                // UIManager.showToast('تم الحذف بنجاح', 'success'); // If UIManager exists
             } catch (e) {
                 console.error("Delete failed", e);
                 alert("فشل الحذف");
+            }
+        };
+
+        window.deleteAllNotifications = async () => {
+            if (!confirm("⚠️ تحذير: هل أنت متأكد من حذف كافة إشعاراتك؟")) return;
+
+            const btn = document.getElementById('teacher-delete-all-btn');
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            try {
+                const q = query(
+                    collection(db, "notifications"),
+                    where("teacherId", "==", currentUid)
+                );
+                const snapshot = await getDocs(q);
+                const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+                await Promise.all(deletePromises);
+
+                alert("تم حذف السجل بنجاح");
+                loadHistory();
+
+            } catch (e) {
+                console.error(e);
+                alert("فشل حذف الكل");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
             }
         };
 

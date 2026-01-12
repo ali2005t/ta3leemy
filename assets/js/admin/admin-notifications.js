@@ -126,6 +126,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    // 4. Delete All Function
+    window.deleteAllAdminNotifications = async () => {
+        if (!confirm("⚠️ تحذير: هل أنت متأكد من حذف كافة إشعاراتك؟ لا يمكن التراجع عن هذا الإجراء.")) return;
+
+        const btn = document.getElementById('delete-all-btn');
+        if (btn) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحذف...';
+            btn.disabled = true;
+        }
+
+        try {
+            // Query all admin notifications
+            const q = query(
+                collection(db, "notifications"),
+                where("sender", "==", "admin")
+            );
+            const snapshot = await getDocs(q);
+
+            if (snapshot.empty) {
+                alert("لا توجد إشعارات لحذفها.");
+            } else {
+                // Batch delete not always possible for large sets on client, using parallel promises
+                const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+                await Promise.all(deletePromises);
+                alert("تم حذف جميع الإشعارات بنجاح.");
+            }
+
+            await loadHistory();
+
+        } catch (e) {
+            console.error("Delete All Error:", e);
+            alert("حدث خطأ أثناء الحذف.");
+        } finally {
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-trash-alt"></i> حذف الكل';
+                btn.disabled = false;
+            }
+        }
+    };
+
     // Initial Load
     loadHistory();
 

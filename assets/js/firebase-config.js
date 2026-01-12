@@ -17,17 +17,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app); // Disabled to prevent 404 errors (User request) Init (Prevents 404 on Localhost)
 // Safe Analytics Init (Prevents 404 on Localhost)
-let analytics;
-try {
-    if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
-        analytics = getAnalytics(app);
-    } else {
-        console.log("Analytics disabled on localhost");
-        analytics = { logEvent: () => { } }; // Mock
-    }
-} catch (e) {
-    console.warn("Analytics Init Failed:", e);
-}
+// Analytics Disabled to prevent 404 errors (User request)
+let analytics = {
+    logEvent: () => { console.log("Analytics (Mock): Event logged"); }
+};
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
