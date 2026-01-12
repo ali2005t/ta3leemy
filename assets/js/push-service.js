@@ -46,7 +46,7 @@ export const PushService = {
 
         const headers = {
             "Content-Type": "application/json; charset=utf-8",
-            "Authorization": `Basic ${keys.apiKey}`
+            "x-auth": `Basic ${keys.apiKey}`
         };
 
         const payload = {
@@ -62,8 +62,8 @@ export const PushService = {
         };
 
         try {
-            // PROXY WORKAROUND: Vercel Backend
-            const proxyUrl = "/api/proxy?target=";
+            // PROXY WORKAROUND: Vercel Backend (Absolute)
+            const proxyUrl = "https://ta3leemy.vercel.app/api/proxy?target=";
             const targetUrl = "https://onesignal.com/api/v1/notifications";
             const finalUrl = proxyUrl + encodeURIComponent(targetUrl);
 
@@ -96,7 +96,7 @@ export const PushService = {
 
         const headers = {
             "Content-Type": "application/json; charset=utf-8",
-            "Authorization": `Basic ${keys.apiKey}`
+            "x-auth": `Basic ${keys.apiKey}` // Send as custom header to bypass stripping
         };
 
         const payload = {
@@ -109,9 +109,8 @@ export const PushService = {
         };
 
         try {
-            // PROXY WORKAROUND: Using our own Vercel Backend (Secure & Free)
-            // This calls the file /api/proxy.js
-            const proxyUrl = "/api/proxy?target=";
+            // PROXY WORKAROUND: Absolute Vercel URL to allow cross-origin usage (from GitHub Pages)
+            const proxyUrl = "https://ta3leemy.vercel.app/api/proxy?target=";
             const targetUrl = "https://onesignal.com/api/v1/notifications";
             const finalUrl = proxyUrl + encodeURIComponent(targetUrl);
 

@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, x-auth');
 
     // 2. Handle Preflight Options Request
     if (req.method === 'OPTIONS') {
@@ -19,13 +19,13 @@ export default async function handler(req, res) {
         }
 
         // 3. Construct Headers for the Outgoing Request
-        // Node.js http request headers are lower-case.
-        const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+        // We use 'x-auth' from the client to avoid header stripping by Vercel/Browsers
+        const authHeader = req.headers['authorization'] || req.headers['Authorization'] || req.headers['x-auth'];
         const contentType = req.headers['content-type'] || 'application/json';
 
         const outputHeaders = {
             'Content-Type': contentType,
-            'Authorization': authHeader // Forward the key securely
+            'Authorization': authHeader // Forward as standard Auth to OneSignal
         };
 
         // 4. Forward to OneSignal
