@@ -12,20 +12,23 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { target } = req.query;
+        const { target, auth_key } = req.query;
 
         if (!target) {
             return res.status(400).json({ error: "Missing 'target' query parameter" });
         }
 
         // 3. Construct Headers for the Outgoing Request
-        // We use 'x-auth' from the client to avoid header stripping by Vercel/Browsers
-        const authHeader = req.headers['authorization'] || req.headers['Authorization'] || req.headers['x-auth'];
+        // Priority: Query Param (Best for bypassing stripping) > Custom Header > Std Header
+        let token = auth_key;
+        if (!token) token = req.headers['x-auth'];
+        if (!token) token = req.headers['authorization'];
+
         const contentType = req.headers['content-type'] || 'application/json';
 
         const outputHeaders = {
             'Content-Type': contentType,
-            'Authorization': authHeader // Forward as standard Auth to OneSignal
+            'Authorization': token // Forward the token explicitly
         };
 
         // 4. Forward to OneSignal

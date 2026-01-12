@@ -45,8 +45,7 @@ export const PushService = {
         if (!keys) return { success: false, error: "Missing OneSignal Keys in Teacher Profile" };
 
         const headers = {
-            "Content-Type": "application/json; charset=utf-8",
-            "x-auth": `Basic ${keys.apiKey}`
+            "Content-Type": "application/json; charset=utf-8"
         };
 
         const payload = {
@@ -62,10 +61,12 @@ export const PushService = {
         };
 
         try {
-            // PROXY WORKAROUND: Vercel Backend (Absolute)
-            const proxyUrl = "https://ta3leemy.vercel.app/api/proxy?target=";
+            // PROXY WORKAROUND: Pass Key in URL
+            const proxyUrl = "https://ta3leemy.vercel.app/api/proxy";
             const targetUrl = "https://onesignal.com/api/v1/notifications";
-            const finalUrl = proxyUrl + encodeURIComponent(targetUrl);
+            const pKey = keys.apiKey.startsWith("Basic ") ? keys.apiKey : `Basic ${keys.apiKey}`;
+
+            const finalUrl = `${proxyUrl}?target=${encodeURIComponent(targetUrl)}&auth_key=${encodeURIComponent(pKey)}`;
 
             const response = await fetch(finalUrl, {
                 method: "POST",
@@ -95,8 +96,7 @@ export const PushService = {
         if (!keys) return { success: false, error: "Missing OneSignal Keys" };
 
         const headers = {
-            "Content-Type": "application/json; charset=utf-8",
-            "x-auth": `Basic ${keys.apiKey}` // Send as custom header to bypass stripping
+            "Content-Type": "application/json; charset=utf-8"
         };
 
         const payload = {
@@ -109,10 +109,13 @@ export const PushService = {
         };
 
         try {
-            // PROXY WORKAROUND: Absolute Vercel URL to allow cross-origin usage (from GitHub Pages)
-            const proxyUrl = "https://ta3leemy.vercel.app/api/proxy?target=";
+            // PROXY WORKAROUND: Pass Key in URL to guarantee it reaches the proxy (Header stripping bypass)
+            const proxyUrl = "https://ta3leemy.vercel.app/api/proxy";
             const targetUrl = "https://onesignal.com/api/v1/notifications";
-            const finalUrl = proxyUrl + encodeURIComponent(targetUrl);
+            // Check if key already has 'Basic ', if not add it
+            const pKey = keys.apiKey.startsWith("Basic ") ? keys.apiKey : `Basic ${keys.apiKey}`;
+
+            const finalUrl = `${proxyUrl}?target=${encodeURIComponent(targetUrl)}&auth_key=${encodeURIComponent(pKey)}`;
 
             const response = await fetch(finalUrl, {
                 method: "POST",
