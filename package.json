@@ -1,0 +1,10 @@
+{
+  "name": "ta3leemy-backend",
+  "version": "1.0.0",
+  "description": "Backend Proxy for Ta3leemy Notifications",
+  "private": true,
+  "engines": {
+    "node": "20.x"
+  },
+  "dependencies": {}
+}
