@@ -51,17 +51,28 @@
         box-shadow: -5px 0 20px rgba(0, 0, 0, 0.05);
         z-index: 2000;
 
-        /* PERSISTENT ON DESKTOP */
-        transform: translateX(0) !important;
+        /* HIDDEN BY DEFAULT (Mobile-like behavior on Desktop) */
+        transform: translateX(100%) !important;
+        /* Hidden Right */
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         opacity: 1 !important;
+    }
+
+    /* Active State for Desktop */
+    .bottom-nav.sidebar-open {
+        transform: translateX(0) !important;
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1) !important;
     }
 
     /* Shift Content Logic */
     body {
-        padding-right: 320px !important;
-        /* 300px sidebar + 20px gap */
+        padding-right: 0 !important;
+        /* No fixed padding, overlay mode */
         padding-left: 0 !important;
+        transition: padding-right 0.3s;
     }
+
+    /* Optional: Push content when open? No, User prefers overlay or mobile style. */
 
     .app-content {
         max-width: 1200px !important;
@@ -114,8 +125,30 @@
 
     /* --- Menu Toggle Button (Desktop Only) --- */
     #desktop-menu-btn {
-        display: none !important;
-        /* Hidden because sidebar is persistent */
+        display: flex !important;
+        /* Visible now */
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 2100;
+        background: white;
+        padding: 10px;
+        border-radius: 50%;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        border: 1px solid #e2e8f0;
+        color: var(--app-primary);
+        font-size: 1.2rem;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        transition: all 0.2s;
+    }
+
+    #desktop-menu-btn:hover {
+        background: var(--app-primary);
+        color: white;
     }
 
     /* --- Overlay Backdrop --- */

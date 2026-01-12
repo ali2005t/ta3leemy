@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const title = document.getElementById('training-title').value;
         const desc = document.getElementById('training-desc').value;
-        const image = document.getElementById('training-image').value || 'https://via.placeholder.com/400x200?text=Training';
+        const image = document.getElementById('training-image').value || '../assets/images/icon%20platform%20.png';
         const order = document.getElementById('training-order').value;
         // Price removed from UI, default to 0
         const price = 0;
