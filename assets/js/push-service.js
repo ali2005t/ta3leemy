@@ -38,6 +38,8 @@ export const PushService = {
     async sendToUsers(teacherId, userIds, title, message, data = {}) {
         if (!userIds || userIds.length === 0) return { success: false, error: "No users targeted" };
 
+        console.log("🚀 PushService: Using Vercel Proxy v2.0");
+
         // 1. Get Keys
         const keys = await this.getTeacherKeys(teacherId);
         if (!keys) return { success: false, error: "Missing OneSignal Keys in Teacher Profile" };
