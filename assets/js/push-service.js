@@ -60,20 +60,16 @@ export const PushService = {
         };
 
         try {
-            // PROXY WORKAROUND
-            const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+            // PROXY WORKAROUND: Vercel Backend
+            const proxyUrl = "/api/proxy?target=";
             const targetUrl = "https://onesignal.com/api/v1/notifications";
-            const finalUrl = proxyUrl + targetUrl;
+            const finalUrl = proxyUrl + encodeURIComponent(targetUrl);
 
             const response = await fetch(finalUrl, {
                 method: "POST",
                 headers: headers,
                 body: JSON.stringify(payload)
             });
-
-            if (response.status === 403) {
-                throw new Error("Activation Required");
-            }
 
             const result = await response.json();
 
@@ -87,9 +83,6 @@ export const PushService = {
 
         } catch (error) {
             console.error("Push Network Error:", error);
-            if (error.message.includes("Activation Required")) {
-                return { success: false, error: "يجب تفعيل السيرفر أولاً: افتح https://cors-anywhere.herokuapp.com/corsdemo واضغط Request access" };
-            }
             return { success: false, error: error.message };
         }
     },
@@ -114,20 +107,17 @@ export const PushService = {
         };
 
         try {
-            // PROXY WORKAROUND: Using 'cors-anywhere' which is the most reliable, but requires 1-time activation.
-            const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+            // PROXY WORKAROUND: Using our own Vercel Backend (Secure & Free)
+            // This calls the file /api/proxy.js
+            const proxyUrl = "/api/proxy?target=";
             const targetUrl = "https://onesignal.com/api/v1/notifications";
-            const finalUrl = proxyUrl + targetUrl; // No encoding needed for this one usually
+            const finalUrl = proxyUrl + encodeURIComponent(targetUrl);
 
             const response = await fetch(finalUrl, {
                 method: "POST",
                 headers: headers,
                 body: JSON.stringify(payload)
             });
-
-            if (response.status === 403) {
-                throw new Error("Activation Required: Visit https://cors-anywhere.herokuapp.com/corsdemo");
-            }
 
             // Note: response.ok check might be needed if proxy fails, but .json() usually handles it
             const result = await response.json();
@@ -142,9 +132,7 @@ export const PushService = {
 
         } catch (error) {
             console.error("Broadcast Push Network Error:", error);
-            if (error.message.includes("Activation Required")) {
-                return { success: false, error: "يجب تفعيل السيرفر أولاً: افتح https://cors-anywhere.herokuapp.com/corsdemo واضغط Request access" };
-            }
+            console.error("Broadcast Push Network Error:", error);
             return { success: false, error: "Network/Proxy Error: " + error.message };
         }
     }
