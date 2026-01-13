@@ -70,14 +70,69 @@
                                 وعلامة (-) فقط. هذا سيجعل رابط تطبيقك احترافياً.</p>
                         </div>
                         <div class="form-group" style="margin-bottom:1.5rem;">
-                            <label style="display:block; margin-bottom:0.5rem; color:#94a3b8;">لون المنصة
+                            <label style="display:block; margin-bottom:0.8rem; color:#94a3b8;">لون المنصة
                                 الرئيسي</label>
-                            <div style="display:flex; gap:10px; align-items:center;">
-                                <input type="color" id="platform-color" value="#6366f1"
-                                    style="height:40px; border:none; background:none;">
-                                <span style="color:#64748b; font-size:0.9rem;">سيتم تطبيق هذا اللون على التطبيق والموقع
-                                    الخاص بك.</span>
+
+                            <!-- Preset Themes -->
+                            <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                                <div onclick="setTheme('#6366f1')" class="theme-swatch" style="background:#6366f1;"
+                                    title="Indigo"></div>
+                                <div onclick="setTheme('#3b82f6')" class="theme-swatch" style="background:#3b82f6;"
+                                    title="Blue"></div>
+                                <div onclick="setTheme('#0ea5e9')" class="theme-swatch" style="background:#0ea5e9;"
+                                    title="Sky"></div>
+                                <div onclick="setTheme('#10b981')" class="theme-swatch" style="background:#10b981;"
+                                    title="Emerald"></div>
+                                <div onclick="setTheme('#f59e0b')" class="theme-swatch" style="background:#f59e0b;"
+                                    title="Amber"></div>
+                                <div onclick="setTheme('#f43f5e')" class="theme-swatch" style="background:#f43f5e;"
+                                    title="Rose"></div>
+                                <div onclick="setTheme('#8b5cf6')" class="theme-swatch" style="background:#8b5cf6;"
+                                    title="Violet"></div>
+                                <div onclick="setTheme('#0f172a')" class="theme-swatch" style="background:#0f172a;"
+                                    title="Dark Slate"></div>
                             </div>
+
+                            <div
+                                style="display:flex; gap:10px; align-items:center; background:#0f172a; padding:10px; border-radius:8px; border:1px solid #334155;">
+                                <input type="color" id="platform-color" value="#6366f1"
+                                    style="height:35px; width:50px; border:none; background:none; cursor:pointer;">
+                                <span style="color:#cbd5e1; font-size:0.9rem;">تخصيص لون مخصص</span>
+                            </div>
+                            <style>
+                                .theme-swatch {
+                                    width: 45px;
+                                    height: 35px;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    transition: transform 0.2s, box-shadow 0.2s;
+                                    border: 2px solid transparent;
+                                }
+
+                                .theme-swatch:hover {
+                                    transform: translateY(-3px);
+                                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                                }
+
+                                .theme-swatch.active {
+                                    border-color: white;
+                                    box-shadow: 0 0 0 2px #3b82f6;
+                                }
+                            </style>
+                            <script>
+                                function setTheme(color) {
+                                    document.getElementById('platform-color').value = color;
+                                    // Visual Feedback
+                                    document.querySelectorAll('.theme-swatch').forEach(el => {
+                                        el.classList.remove('active');
+                                        if (el.getAttribute('onclick').includes(color)) el.classList.add('active');
+                                    });
+                                }
+                                // Sync manual input
+                                document.getElementById('platform-color').addEventListener('input', (e) => {
+                                    document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('active'));
+                                });
+                            </script>
                         </div>
                         <div class="form-group">
                             <label style="display:block; margin-bottom:0.5rem; color:#94a3b8;">شعار المنصة</label>

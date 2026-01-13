@@ -2,6 +2,7 @@ import { auth, db } from './firebase-config.js';
 import { signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import './global-ui.js'; // Ensure global UI (Theme & Branding) is loaded
+import './check-maintenance.js'; // Global Maintenance Check
 
 const TEACHER_SIDEBAR = [
     // Group: Dashboard (Standalone)

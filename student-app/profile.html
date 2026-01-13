@@ -272,7 +272,8 @@
             background: #f1f5f9;
         }
     </style>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script></head>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+</head>
 
 <body>
 
@@ -418,8 +419,9 @@
             }
 
             // Logout
-            document.getElementById('logout-btn').onclick = () => {
-                signOut(auth).then(() => window.location.href = 'login.html');
+            document.getElementById('logout-btn').onclick = (e) => {
+                e.preventDefault();
+                if (window.logoutUser) window.logoutUser();
             };
 
             // Support Logic
@@ -459,34 +461,61 @@
             };
 
             // Notification Toggle (OneSignal)
-            function checkOneSignal() {
-                if (window.OneSignalDeferred) {
-                    OneSignalDeferred.push(async function (OneSignal) {
-                        // v16 API: OneSignal.Notifications.permission (property)
-                        const permission = OneSignal.Notifications.permission; // boolean or string
-                        const icon = document.getElementById('notif-status-icon');
+            if (window.OneSignalDeferred) {
+                OneSignalDeferred.push(async function (OneSignal) {
+                    const icon = document.getElementById('notif-status-icon');
+                    const row = document.getElementById('notif-toggle-row');
 
-                        // Check if granted (it returns boolean in v16 usually, or 'granted' string in some contexts, safer to check both or log)
-                        if (permission === true || permission === 'granted') {
-                            icon.className = 'fas fa-toggle-on';
-                            icon.style.color = '#10b981'; // Green
-                        } else {
-                            icon.className = 'fas fa-toggle-off';
-                            icon.style.color = '#cbd5e1';
-                        }
+                    // 1. Localhost Simulation
+                    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                        // Check simulated state
+                        const isSimulatedOn = localStorage.getItem('sim_notif') === 'true';
+                        updateIcon(isSimulatedOn);
 
-                        document.getElementById('notif-toggle-row').onclick = async () => {
-                            // v16 API
-                            await OneSignal.Notifications.requestPermission();
-                            // Update icon after request
-                            const newPerm = OneSignal.Notifications.permission;
-                            if (newPerm === true || newPerm === 'granted') {
+                        row.onclick = () => {
+                            const newState = !isSimulatedOn;
+                            localStorage.setItem('sim_notif', newState);
+                            updateIcon(newState);
+                            // alert(newState ? "تم تفعيل الإشعارات (محاكاة)" : "تم إيقاف الإشعارات (محاكاة)");
+                            updateIcon(localStorage.getItem('sim_notif') === 'true'); // Refresh scope variable workaround
+                        };
+
+                        function updateIcon(isOn) {
+                            if (isOn) {
                                 icon.className = 'fas fa-toggle-on';
                                 icon.style.color = '#10b981';
+                            } else {
+                                icon.className = 'fas fa-toggle-off';
+                                icon.style.color = '#cbd5e1';
                             }
-                        };
-                    });
-                }
+                        }
+                        return; // Stop here for localhost
+                    }
+
+                    // 2. Real OneSignal Logic
+                    // v16 API: OneSignal.Notifications.permission (property)
+                    const permission = OneSignal.Notifications.permission; // boolean or string
+
+                    // Check if granted
+                    if (permission === true || permission === 'granted') {
+                        icon.className = 'fas fa-toggle-on';
+                        icon.style.color = '#10b981'; // Green
+                    } else {
+                        icon.className = 'fas fa-toggle-off';
+                        icon.style.color = '#cbd5e1';
+                    }
+
+                    row.onclick = async () => {
+                        // v16 API
+                        await OneSignal.Notifications.requestPermission();
+                        // Update icon after request
+                        const newPerm = OneSignal.Notifications.permission;
+                        if (newPerm === true || newPerm === 'granted') {
+                            icon.className = 'fas fa-toggle-on';
+                            icon.style.color = '#10b981';
+                        }
+                    };
+                });
             }
 
         });

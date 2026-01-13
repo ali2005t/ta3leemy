@@ -1,4 +1,5 @@
 import { auth, db } from './firebase-config.js';
+import './check-maintenance.js'; // Global Maintenance Check
 import { doc, getDoc, collection, query, where, getDocs, orderBy, limit, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { initSupportWidget } from './support-widget.js';
 // UIManager assumed global

@@ -9,15 +9,16 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/fi
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 window.OneSignalDeferred.push(async function (OneSignal) {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        console.warn('OneSignal: Running on Localhost. Ensure you allow notifications.');
-        // We do NOT return here anymore; we allow it to try init.
+        console.warn('OneSignal: Running on Localhost. Notifications disabled to prevent errors.');
+        return; // Stop here to prevent "App not configured" error
     }
+
     // Only init if not already initialized
     if (!OneSignal.initialized) {
         await OneSignal.init({
             appId: "3dd814ae-df51-4396-8aca-0877931b7b5f", // Replace with your App ID
             safari_web_id: "web.onesignal.auto.xxxxx",
-            // notifyButton: { enable: true } // We will make our own custom UI
+            allowLocalhostAsSecureOrigin: true, // Attempt to allow if configured
         });
     }
 
@@ -59,11 +60,7 @@ window.OneSignalDeferred.push(async function (OneSignal) {
     if (OneSignal.Notifications.permission !== "granted") {
         showNotificationBanner(OneSignal);
     }
-} else {
-    // Legacy
-    OneSignal.showNativePrompt();
-}
-});
+}); // Close push function cleanly
 
 function showNotificationBanner(OneSignal) {
     const banner = document.createElement('div');
@@ -164,6 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (user) {
             console.log("Auth State: Logged In", user.uid);
             initStudentNotifications(user.uid);
+            injectDesktopHeader(user); // Inject Header
         } else {
             console.log("Auth State: Null. checking backup...");
             const storedAuth = localStorage.getItem('median_auth_data');
@@ -250,4 +248,312 @@ function showToast(title, body) {
         div.style.transition = 'opacity 0.5s';
         setTimeout(() => div.remove(), 500);
     }, 4000);
+}
+
+async function injectDesktopHeader(user) {
+    // Only for Desktop (we can check simple width first or let CSS handle display)
+    // We let CSS handle display:none on mobile, so we just inject it.
+
+    // Exclude injection on Home Page (User Request)
+    const currentPath = window.location.pathname;
+    // Check for home.html or root path if applicable
+    // Check for home.html or root path if applicable
+    if (currentPath.includes('home.html') || currentPath.endsWith('/')) {
+        // Reset body padding for Home Page (No fixed header)
+        document.body.style.paddingTop = '0px';
+        return;
+    }
+
+
+    if (document.getElementById('student-desktop-header')) return;
+
+    const header = document.createElement('header');
+    header.id = 'student-desktop-header';
+    header.className = 'desktop-header'; // Styles in student-desktop.css
+    // hidden by default in CSS if not desktop media query
+
+    let displayName = user.displayName;
+    const photoURL = user.photoURL || null;
+
+    // If displayName is missing, try to fetch from Firestore 'students'
+    if (!displayName) {
+        try {
+            const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            const userDoc = await getDoc(doc(db, "students", user.uid));
+            if (userDoc.exists()) {
+                displayName = userDoc.data().name;
+            }
+        } catch (e) {
+            console.error("Error fetching student name:", e);
+        }
+    }
+
+    // Fallback if still missing
+    if (!displayName) displayName = 'طالب مجتهد';
+
+    // HTML Structure
+    const backBtnHtml = `
+        <button onclick="window.history.back()" class="desktop-back-btn" title="رجوع">
+            <i class="fas fa-arrow-right"></i>
+        </button>
+    `;
+
+    header.innerHTML = `
+        <div style="display:flex; align-items:center; gap:15px;">
+             ${backBtnHtml}
+             <div class="user-info">
+                <div class="user-avatar" onclick="window.location.href='profile.html'">
+                    ${photoURL ? `<img src="${photoURL}">` : '<i class="fas fa-user"></i>'}
+                </div>
+                <div style="display:flex; flex-direction:column;">
+                     <span style="font-size:0.8rem; color:#64748b;">مرحباً بك</span>
+                     <span class="user-name">${displayName}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+             <button class="theme-toggle" onclick="toggleDarkMode()" title="تبديل الوضع الليلي">
+                <i class="fas fa-moon"></i>
+             </button>
+             <button class="logout-btn" onclick="logoutUser()">
+                 <i class="fas fa-sign-out-alt"></i>
+                 <span>تسجيل خروج</span>
+             </button>
+        </div>
+        
+        <style>
+            .desktop-back-btn {
+                width: 40px; 
+                height: 40px; 
+                border-radius: 50%; 
+                border: 1px solid #e2e8f0; 
+                background: white; 
+                color: #1e293b;
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                cursor: pointer; 
+                transition: all 0.2s;
+            }
+            .desktop-back-btn:hover {
+                background: #f1f5f9;
+                color: var(--primary-color, #6366f1);
+                transform: translateX(3px); 
+            }
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                border: 1px solid #e2e8f0;
+                background: white;
+                color: #64748b;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s;
+                font-size: 1.1rem;
+            }
+            .theme-toggle:hover {
+                background: #f1f5f9;
+                color: #1e293b;
+            }
+            body.dark-mode .theme-toggle {
+                background: #334155;
+                border-color: #475569;
+                color: #f1f5f9;
+            }
+            body.dark-mode .desktop-back-btn {
+                background: #334155;
+                border-color: #475569;
+                color: #f1f5f9;
+            }
+            body.dark-mode .desktop-back-btn:hover {
+                background: #475569;
+            }
+        </style>
+    `;
+
+
+    document.body.prepend(header);
+
+    // Dark Mode Logic
+    window.toggleDarkMode = () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('theme_mode', isDark ? 'dark' : 'light');
+        updateThemeIcon(isDark);
+    };
+
+    function updateThemeIcon(isDark) {
+        const btn = document.querySelector('.theme-toggle i');
+        if (btn) {
+            btn.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            if (isDark) btn.style.color = '#fbbf24'; // Amber sun
+            else btn.style.color = '';
+        }
+    }
+
+    // Init Theme
+    const savedTheme = localStorage.getItem('theme_mode');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        updateThemeIcon(true);
+    }
+
+
+    // Global Logout Function with Custom Modal
+    window.logoutUser = () => {
+        // Check if modal already exists
+        if (document.getElementById('custom-logout-modal')) return;
+
+        const modalHtml = `
+            <div id="custom-logout-modal" class="custom-modal-overlay">
+                <div class="custom-modal-content">
+                    <div class="modal-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <h3>تسجيل الخروج</h3>
+                    <p>هل أنت متأكد أنك تريد تسجيل الخروج؟</p>
+                    <div class="modal-actions">
+                        <button id="confirm-logout" class="btn-danger">نعم، خروج</button>
+                        <button id="cancel-logout" class="btn-secondary">إلغاء</button>
+                    </div>
+                </div>
+            </div>
+            <style>
+                .custom-modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(15, 23, 42, 0.6);
+                    backdrop-filter: blur(4px);
+                    z-index: 9999;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    animation: fadeIn 0.2s ease-out;
+                }
+                .custom-modal-content {
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 20px;
+                    width: 90%;
+                    max-width: 400px;
+                    text-align: center;
+                    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+                body.dark-mode .custom-modal-content {
+                    background: #1e293b;
+                    color: #f1f5f9;
+                    border: 1px solid #334155;
+                }
+                .modal-icon {
+                    width: 60px;
+                    height: 60px;
+                    background: #fee2e2;
+                    color: #ef4444;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.5rem;
+                    margin: 0 auto 1rem;
+                }
+                body.dark-mode .modal-icon {
+                    background: rgba(239, 68, 68, 0.2);
+                }
+                .custom-modal-content h3 {
+                    margin-bottom: 0.5rem;
+                    font-size: 1.25rem;
+                    font-weight: 700;
+                }
+                .custom-modal-content p {
+                    color: #64748b;
+                    margin-bottom: 1.5rem;
+                }
+                body.dark-mode .custom-modal-content p {
+                    color: #94a3b8;
+                }
+                .modal-actions {
+                    display: flex;
+                    gap: 1rem;
+                    justify-content: center;
+                }
+                .modal-actions button {
+                    flex: 1;
+                    padding: 0.75rem 1rem;
+                    border-radius: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    border: none;
+                    transition: all 0.2s;
+                    font-size: 1rem;
+                }
+                .btn-danger {
+                    background: #ef4444;
+                    color: white;
+                }
+                .btn-danger:hover {
+                    background: #dc2626;
+                }
+                .btn-secondary {
+                    background: #f1f5f9;
+                    color: #475569;
+                }
+                .btn-secondary:hover {
+                    background: #e2e8f0;
+                }
+                body.dark-mode .btn-secondary {
+                    background: #334155;
+                    color: #cbd5e1;
+                }
+                body.dark-mode .btn-secondary:hover {
+                    background: #475569;
+                }
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            </style>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Event Listeners
+        document.getElementById('cancel-logout').onclick = () => {
+            document.getElementById('custom-logout-modal').remove();
+        };
+
+        document.getElementById('confirm-logout').onclick = async () => {
+            // Import auth dynamically if needed or use global
+            // Usually auth is imported in module. 
+            // Since student-common.js is a module that might not import auth directly in this scope if not defined.
+            // But let's try to assume global availability or dynamic import.
+            // Actually, the original code had `logoutUser` doing simple redirect or confirm.
+            // It didn't seem to have the `signOut` logic inside standard `student-common.js` usually unless connected.
+            // However, `profile.html` had `signOut`.
+
+            // Let's standardise:
+            try {
+                const { getAuth, signOut } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
+                const auth = getAuth();
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (e) {
+                console.error("Logout failed", e);
+                // Fallback
+                window.location.href = 'login.html';
+            }
+        };
+
+        // Close on click outside
+        document.getElementById('custom-logout-modal').onclick = (e) => {
+            if (e.target.id === 'custom-logout-modal') {
+                e.target.remove();
+            }
+        };
+    };
 }

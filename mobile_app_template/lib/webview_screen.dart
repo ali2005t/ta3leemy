@@ -37,6 +37,13 @@ class _WebViewScreenState extends State<WebViewScreen> {
                 // ✅ التخزين المحلي (عشان "تذكرني" تشتغل) | Local Storage
                 domStorageEnabled: true,
                 databaseEnabled: true,
+                
+                // ✅ الكوكيز (مهم جداً لحفظ الجلسة)
+                thirdPartyCookiesEnabled: true,
+                cacheEnabled: true,
+                clearCache: false,
+                clearSessionCache: false,
+
 
                 // ✅ منع التكبير/التصغير اليدوي (للحفاظ على شكل التطبيق)
                 supportZoom: false,

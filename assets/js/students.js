@@ -10,7 +10,8 @@ import {
     getDoc,
     doc,
     updateDoc,
-    arrayRemove
+    arrayRemove,
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { UIManager } from './ui-manager.js';
 // const UIManager = window.UIManager;
@@ -51,31 +52,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 where("enrolledTeachers", "array-contains", teacherId)
             );
 
-            const snapshot = await getDocs(q);
+            // Realtime Listener
+            onSnapshot(q, (snapshot) => {
+                studentsData = [];
+                if (snapshot.empty) {
+                    loadingIndicator.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    renderTable([]);
+                    return;
+                }
 
-            studentsData = []; // Reset global data
+                snapshot.forEach(doc => {
+                    studentsData.push({ id: doc.id, ...doc.data() });
+                });
 
-            if (snapshot.empty) {
+                renderTable(studentsData);
                 loadingIndicator.style.display = 'none';
-                emptyState.style.display = 'block';
-                renderTable([]); // Clear table
-                return;
-            }
 
-            snapshot.forEach(doc => {
-                studentsData.push({ id: doc.id, ...doc.data() });
+            }, (error) => {
+                console.error("Realtime Error:", error);
+                loadingIndicator.innerText = "خطأ في الاتصال: " + error.message;
             });
 
-            renderTable(studentsData);
-            loadingIndicator.style.display = 'none';
-
         } catch (error) {
-            console.error("Error loading students:", error);
-            loadingIndicator.innerText = "حدث خطأ في تحميل البيانات: " + error.message;
-            // Often requires index: https://console.firebase.google.com/...
-            if (error.code === 'failed-precondition') {
-                console.warn("Please create the required index in Firebase Console.");
-            }
+            console.error("Error setting up listener:", error);
+            loadingIndicator.innerText = "حدث خطأ: " + error.message;
         }
     }
 
@@ -176,8 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 isBanned: !currentStatus
             });
             UIManager.showToast(`تم ${action} الطالب بنجاح`);
-            // Reload
-            if (currentUser) loadStudents(currentUser.uid);
+            // Listener will update UI
         } catch (e) {
             console.error(e);
             UIManager.showToast("حدث خطأ أثناء تنفيذ الأمر", "error");
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             UIManager.showToast("تم حذف الطالب بنجاح");
-            loadStudents(uid);
+            // loadStudents(uid); // Realtime handles it
 
         } catch (e) {
             console.error(e);

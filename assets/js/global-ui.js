@@ -26,27 +26,53 @@ export const GlobalUI = {
         const footer = document.createElement('div');
         footer.id = 'ta3leemy-branding';
 
-        // Using CSS Vars for Automatic Theme Switching
-        // Text Secondary for 'Powered by'
-        // Text Primary for 'Ta3leemy Platform'
-        footer.innerHTML = `
-            <div style="
-                width: 100%;
-                text-align: center;
-                padding: 40px 0 30px 0;
-                margin-top: 60px;
-                opacity: 0.8; 
-                font-family: 'Segoe UI', sans-serif;
-                font-size: 1rem;
-                color: var(--text-muted, #94a3b8);
-                border-top: 1px solid var(--border-color, rgba(255,255,255,0.1));
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 5px;
-            ">
-                <span style="font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;">Powered By</span>
-                <strong style="font-size: 1.2rem; color: var(--text-color, #ffffff); letter-spacing: 0.5px;">Ta3leemy Platform</strong>
+        // Using Embedded Styles for Theme Awareness (Dark Default / Light Override)
+        const styles = `
+            <style>
+                .branding-footer {
+                    width: 100%;
+                    text-align: center;
+                    padding: 40px 0 30px 0;
+                    margin-top: 60px;
+                    opacity: 0.8;
+                    font-family: 'Segoe UI', sans-serif;
+                    font-size: 1rem;
+                    border-top: 1px solid rgba(255, 255, 255, 0.1);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 5px;
+                }
+                .branding-label {
+                    font-size: 0.85rem;
+                    letter-spacing: 1px;
+                    text-transform: uppercase;
+                    color: #94a3b8; /* Default Slate */
+                }
+                .branding-name {
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    letter-spacing: 0.5px;
+                    color: #ffffff; /* Default White */
+                }
+                
+                /* LIGHT THEME OVERRIDES */
+                body.light-theme .branding-footer {
+                    border-top: 1px solid rgba(0, 0, 0, 0.1);
+                }
+                body.light-theme .branding-label {
+                    color: #64748b; /* Darker Slate for Light Mode */
+                }
+                body.light-theme .branding-name {
+                    color: #1e293b; /* Dark Blue/Black for Light Mode */
+                }
+            </style>
+        `;
+
+        footer.innerHTML = styles + `
+            <div class="branding-footer">
+                <span class="branding-label">Powered By</span>
+                <span class="branding-name">Ta3leemy Platform</span>
             </div>
         `;
 

@@ -110,7 +110,8 @@
         style="display:flex; justify-content:space-between; align-items:center; background:white; height:60px; padding:0 20px;">
         <div style="display:flex; gap:15px; align-items:center;">
             <!-- Notification Button with Logic -->
-            <button id="notif-btn" style="background:none; border:none; color:#1e293b; position:relative;">
+            <button id="notif-btn" onclick="window.location.href='notifications.html'"
+                style="background:none; border:none; color:#1e293b; position:relative; cursor:pointer;">
                 <i class="fas fa-bell" style="font-size:1.2rem;"></i>
                 <span id="notif-badge"
                     style="position:absolute; top:-2px; right:-2px; background:red; height:8px; width:8px; border-radius:50%; display:none;"></span>
@@ -193,19 +194,42 @@
             <!-- Courses Section -->
             <div id="courses-section" style="display: none; animation: fadeIn 0.4s ease-out;">
 
-                <!-- Back Button -->
-                <button onclick="showLanding()" class="nav-back-btn"
-                    style="background:transparent; border:none; font-weight:700; display:flex; align-items:center; gap:8px; margin-bottom:20px; cursor:pointer; font-size:1rem; padding:10px 0;">
-                    <i class="fas fa-arrow-right" style="color:var(--app-primary);"></i> عودة للرئيسية
-                </button>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 class="section-header"
-                        style="margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-layer-group" style="font-size: 1rem; color: var(--app-primary);"></i>
+                <!-- Header Group -->
+                <!-- Header Group -->
+                <!-- Header Group (Swapped for Correct RTL Layout) -->
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; flex-wrap: wrap; gap: 10px;">
+                    <!-- Title on Right -->
+                    <h3 class="section-header" style="margin: 0; font-size: 1.5rem; font-weight: 800; color: #1e293b;">
                         المراحل الدراسية
                     </h3>
+
+                    <!-- Back Button on Left -->
+                    <button onclick="showLanding()" class="btn-pill-back"
+                        style="display:flex; align-items:center; gap:8px; padding:8px 20px; border-radius:30px; border:1px solid #e2e8f0; background:white; cursor:pointer; font-weight:600; color:#475569; transition:all 0.2s;">
+                        عودة للرئيسية <i class="fas fa-arrow-left"></i>
+                    </button>
                 </div>
+                <style>
+                    .btn-pill-back:hover {
+                        background: #f8fafc !important;
+                        transform: translateX(-3px);
+                        /* Move left on hover in RTL */
+                        border-color: #cbd5e1 !important;
+                        color: #1e293b !important;
+                    }
+
+                    /* Fix Powered By Visibility in Light Mode */
+                    .powered-by,
+                    .footer-copyright {
+                        color: #94a3b8 !important;
+                        /* Darker gray for visibility */
+                    }
+
+                    body.light-theme .powered-by {
+                        color: #64748b !important;
+                    }
+                </style>
 
                 <div id="courses-list">
                     <!-- JS Rows -->

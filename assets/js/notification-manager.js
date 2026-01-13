@@ -5,25 +5,46 @@ import { collection, query, where, onSnapshot, orderBy, limit, getDocs } from "h
 const SOUND_URI = "data:audio/mp3;base64,//uQRAAAAWMSLwUIYAAsYkXgoQwAEaYLWfkWgAI0wWs/ItAAAG84AAAD%20DTEAAAB7%20KAAAAAJDA8%20AAAAAAABREAAAABRThwm8NFbNw8kK1Y7eZ/n%2080f//BGmC1n5FoAAIwWs/ItAAAG84AAAD%20DTEAAAB7%20KAAAAAJDA8%20AAAAAAABREAAAABRThwm8NFbNw8kK1Y7eZ/n%2080f//BGmC1n5FoAAIwWs/ItAAAG84AAAD%20DTEAAAB7%20KAAAAAJDA8%20AAAAAAABREAAAABRThwm8NFbNw8kK1Y7eZ/n%2080f//";
 // Note: The above is a placeholder truncated string. I will use a simple beep function or a valid short base64 in the actual file.
 
-// Real simple beep using AudioContext for cleaner sound without file dependency
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// Lazy-load AudioContext to avoid "prevented from starting" warnings
+let audioCtx = null;
+function getAudioContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+}
+
 function playNotificationSound() {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') {
+        // Try to resume - if blocked by browser, we ignore sound or wait for interaction
+        ctx.resume().then(() => {
+            playSoundOscillator(ctx);
+        }).catch(err => {
+            // Sshh, it's okay. Browser blocked it. 
+            // We just won't play sound this time until user clicks.
+        });
+    } else {
+        playSoundOscillator(ctx);
+    }
+}
+
+function playSoundOscillator(ctx) {
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
 
     oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
-    oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
+    oscillator.frequency.setValueAtTime(440, ctx.currentTime); // A4
+    oscillator.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
 
-    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+    gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
 
     oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
+    gainNode.connect(ctx.destination);
 
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.5);
+    oscillator.stop(ctx.currentTime + 0.5);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -50,7 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Request Audio Context permission on first click
     document.addEventListener('click', () => {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
     }, { once: true });
 });
 

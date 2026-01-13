@@ -80,7 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // --------------------------
 
                 // 1. Enforce Persistence & Attempt Sign In
-                await setPersistence(auth, browserLocalPersistence);
+                const rememberMe = document.getElementById('remember-me');
+                const persistenceMode = (rememberMe && rememberMe.checked) ? browserLocalPersistence : browserSessionPersistence;
+                await setPersistence(auth, persistenceMode);
                 const userCredential = await signInWithEmailAndPassword(auth, identifier, password);
                 const user = userCredential.user;
 

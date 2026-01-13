@@ -16,7 +16,8 @@
             /* Sync with Teacher/Platform Color */
         }
     </style>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script></head>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+</head>
 
 <body>
 
@@ -67,7 +68,13 @@
                     <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
                 </div>
 
-                <div style="text-align: left; margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <label
+                        style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--app-text-muted, #64748b); font-size: 0.9rem;">
+                        <input type="checkbox" id="remember-me"
+                            style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--app-primary);">
+                        <span>تذكرني</span>
+                    </label>
                     <a href="forgot-password.html"
                         style="font-size: 0.85rem; color: var(--app-primary); text-decoration: none;">نسيت كلمة
                         المرور؟</a>

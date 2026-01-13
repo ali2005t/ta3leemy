@@ -21,16 +21,11 @@ import {
     getDocs,
     getCountFromServer
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"; // Import Persistence
+import { setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"; // Import Persistence
 
 // Force Local Persistence
-setPersistence(auth, browserLocalPersistence)
-    .then(() => {
-        // Persistence set
-    })
-    .catch((error) => {
-        console.error("Persistence Error:", error);
-    });
+// Force Local Persistence was here, now handled dynamically
+// setPersistence(auth, browserLocalPersistence)...
 
 
 // === CONFIGURATION ===
@@ -252,13 +247,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const btn = document.getElementById('login-btn');
-            const originalText = document.getElementById('btn-text').innerHTML;
+            const btnTextEl = document.getElementById('btn-text');
+            const originalText = btnTextEl ? btnTextEl.innerHTML : btn.innerText;
             const loader = document.getElementById('btn-loader');
 
             // Loading State
             btn.disabled = true;
-            document.getElementById('btn-text').style.visibility = 'hidden';
-            loader.style.display = 'inline-block';
+            if (btnTextEl) btnTextEl.style.visibility = 'hidden';
+            if (loader) loader.style.display = 'inline-block';
 
             // Hide previous errors
             const errorContainer = document.getElementById('student-error-message');
@@ -321,7 +317,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 // -----------------------------
 
-                // 1. Authenticate (using identifier which is now email)
+                // 1. Authenticate
+                // Determine Persistence Mode
+                const rememberMe = document.getElementById('remember-me');
+                const persistenceMode = (rememberMe && rememberMe.checked) ? browserLocalPersistence : browserSessionPersistence;
+
+                await setPersistence(auth, persistenceMode);
                 const cred = await signInWithEmailAndPassword(auth, identifier, password);
                 const user = cred.user;
 
@@ -426,6 +427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (error.message === "BLOCK_BAN") {
                     alert("⛔ تم حظر حسابك. يرجى التواصل مع الإدارة.");
+                    auth.signOut(); // Force logout
                     auth.signOut(); // Force logout
                 } else if (error.message === "BLOCK_DEVICE") {
                     showDeviceLockModal();

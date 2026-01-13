@@ -3,13 +3,13 @@
 
 export default {
     // 1. 📛 اسم التطبيق (داخلياً)
-    appName: "Sero Math",
+    appName: "Sero",
 
     // 2. 🔗 رابط المنصة
     startUrl: "https://ta3leemy.vercel.app/student-app/login.html#/sero",
 
     // 3. 🎨 اللون الأساسي (لشاشة التحميل)
-    primaryColor: "#6366f1",
+    primaryColor: "#ffffffff",
 
     // 4. 🛑 إعدادات الحماية
     // تفعيل منع السكرين شوت (Android: شاشة سوداء | iOS: منع التسجيل)

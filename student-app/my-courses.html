@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>دوراتي</title>
+    <title>الاشتراكات</title>
 
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/student.css">
@@ -12,14 +12,16 @@
     <link rel="stylesheet" href="../assets/css/student-desktop.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script></head>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script type="module" src="../assets/js/student-common.js"></script>
+</head>
 
 <body>
 
     <!-- Header -->
     <header class="app-header">
         <div class="header-inner">
-            <div class="logo">كورساتي</div>
+            <div class="logo">الاشتراكات</div>
             <div class="header-actions">
                 <!-- Add Profile Icon later -->
             </div>
@@ -116,11 +118,20 @@
         <!-- Courses Section -->
         <div id="courses-section">
             <div id="my-courses-list" class="courses-list" style="display:none;"></div>
-            <div id="courses-empty" class="empty-state" style="display:none; text-align:center; margin-top:3rem;">
-                <i class="fas fa-box-open" style="font-size:3rem; opacity:0.5; margin-bottom:1rem;"></i>
-                <p>لست مشتركاً في أي كورس حالياً</p>
-                <button onclick="window.location.href='home.html'" class="app-btn-outline" style="margin-top:1rem;">تصفح
-                    الكورسات</button>
+            <div id="courses-empty" class="empty-state"
+                style="display:none; text-align:center; padding: 3rem 1rem; animation: fadeIn 0.5s;">
+                <div
+                    style="background: #f1f5f9; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #cbd5e1;">
+                    <i class="fas fa-graduation-cap" style="font-size: 2.5rem;"></i>
+                </div>
+                <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 1.2rem;">لست مشتركاً في أي كورس</h3>
+                <p style="margin: 0 0 25px 0; color: #64748b; font-size: 0.95rem; line-height: 1.5;">
+                    ابدأ رحلتك التعليمية الآن وتصفح الدورات المتاحة
+                </p>
+                <button onclick="window.location.href='home.html'" class="app-btn"
+                    style="background: linear-gradient(135deg, var(--app-primary, #6366f1), #4f46e5); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); cursor: pointer; transition: transform 0.2s;">
+                    تصفح الكورسات <i class="fas fa-arrow-left" style="margin-right: 5px;"></i>
+                </button>
             </div>
         </div>
 

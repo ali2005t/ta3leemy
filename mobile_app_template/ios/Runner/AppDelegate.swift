@@ -4,7 +4,6 @@ import Flutter
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
   
-  // 🔒 متغير لتغطية الشاشة (Blur View)
   var secureView: UIVisualEffectView?
 
   override func application(
@@ -13,14 +12,12 @@ import Flutter
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
     
-    // 🔒 مراقب لحالة التطبيق (App Lifecycle Security)
-    NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive), name: UIApplication.willResignActiveNotification, object: null)
-    NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: null)
+    NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
-  // 🙈 عند الخروج من التطبيق (App Switcher): تغطية الشاشة
   @objc func appWillResignActive() {
     if let window = self.window {
         let blurEffect = UIBlurEffect(style: .dark)
@@ -30,7 +27,6 @@ import Flutter
     }
   }
 
-  // 👀 عند العودة للتطبيق: إزالة الغطاء
   @objc func appDidBecomeActive() {
     secureView?.removeFromSuperview()
   }

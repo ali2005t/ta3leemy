@@ -82,15 +82,37 @@
             margin: 0;
         }
     </style>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script></head>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+</head>
 
 <body>
 
+    <style>
+        .back-btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #1e293b;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .back-btn-circle:hover {
+            background: #e2e8f0;
+            transform: translateX(3px);
+        }
+    </style>
     <header class="app-header">
-        <button class="btn-icon" onclick="window.history.back()">
+        <button class="back-btn-circle" onclick="window.history.back()">
             <i class="fas fa-arrow-right"></i>
         </button>
-        <span style="font-weight:bold; margin-right: 10px;">أهم الإشعارات</span>
+        <span style="font-weight:bold; margin-right: 15px; font-size:1.1rem;">أهم الإشعارات</span>
     </header>
 
     <div class="app-section" style="padding-top: 15px;">
@@ -106,8 +128,12 @@
             <span>الرئيسية</span>
         </a>
         <a href="my-courses.html" class="nav-item">
-            <i class="fas fa-book"></i>
-            <span>كورساتي</span>
+            <i class="fas fa-book-reader"></i>
+            <span>مشترياتي</span>
+        </a>
+        <a href="support.html" class="nav-item">
+            <i class="fas fa-headset"></i>
+            <span>الدعم</span>
         </a>
         <a href="profile.html" class="nav-item">
             <i class="fas fa-user"></i>

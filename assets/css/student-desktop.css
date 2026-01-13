@@ -3,14 +3,94 @@
    Applied only on screens wider than 1024px
 */
 
+/* Mobile Hide */
+.desktop-header {
+    display: none;
+}
+
 @media (min-width: 1024px) {
 
     /* --- General Layout --- */
     body {
         background-color: #f8fafc;
         /* Lighter background */
-        padding-top: 2rem;
-        /* Space for top bar/button */
+        padding-top: 80px;
+        /* Space for fixed header */
+        padding-right: 0 !important;
+        /* Reset */
+    }
+
+    /* --- Desktop Header --- */
+    .desktop-header {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 70px;
+        background: white;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        padding: 0 40px;
+        z-index: 2000;
+        box-sizing: border-box;
+    }
+
+    .desktop-header .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .desktop-header .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        font-size: 1.2rem;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .desktop-header .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .desktop-header .user-name {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 1rem;
+    }
+
+    .desktop-header .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .desktop-header .logout-btn {
+        background: #fee2e2;
+        color: #ef4444;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+
+    .desktop-header .logout-btn:hover {
+        background: #fecaca;
     }
 
     /* Center Content */
@@ -27,6 +107,11 @@
         color: #1e293b;
         margin-bottom: 20px;
         padding-top: 20px;
+    }
+
+    /* Hide Profile Theme Toggle on Desktop (Used in Header instead) */
+    #theme-toggle-row {
+        display: none !important;
     }
 
     /* --- Sidebar (Transforming Bottom Nav) --- */
@@ -49,7 +134,7 @@
         padding: 5rem 1.5rem 2rem !important;
         /* Top padding for toggle button */
         box-shadow: -5px 0 20px rgba(0, 0, 0, 0.05);
-        z-index: 2000;
+        z-index: 2000 !important;
 
         /* HIDDEN BY DEFAULT (Mobile-like behavior on Desktop) */
         transform: translateX(100%) !important;
@@ -128,7 +213,8 @@
         display: flex !important;
         /* Visible now */
         position: fixed;
-        top: 20px;
+        top: 90px;
+        /* Moved down to clear header (70px + 20px) */
         right: 20px;
         z-index: 2100;
         background: white;
@@ -182,12 +268,15 @@
     }
 
     /* Courses List Grid */
+    /* Courses List Grid */
     #courses-list,
     .courses-list,
     .courses-grid {
         display: grid !important;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
-        gap: 25px !important;
+        gap: 20px !important;
+        justify-content: center;
+        /* Center grid if few items */
     }
 
     .training-row {
@@ -196,20 +285,36 @@
         padding: 0 !important;
         overflow: hidden;
         border: 1px solid #e2e8f0;
-        transition: transform 0.3s !important;
+        border-radius: 16px !important;
+        background: white !important;
+        transition: transform 0.3s, box-shadow 0.3s !important;
         height: 100%;
+        max-width: 350px;
+        /* Prevent huge cards */
+        margin: 0 auto;
+        /* Center in grid cell */
     }
 
     .training-row:hover {
         transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
     }
 
     .training-logo {
         width: 100% !important;
-        height: 150px !important;
+        height: 160px !important;
         border-radius: 0 !important;
         margin: 0 !important;
-        font-size: 3rem !important;
+        background: #f8fafc !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .training-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .training-info {
@@ -223,5 +328,71 @@
         display: grid;
         grid-template-columns: 2.5fr 1fr;
         gap: 2rem;
+    }
+
+    /* DARK MODE DESKTOP */
+    body.dark-mode {
+        background-color: #0f172a;
+        color: #f1f5f9;
+    }
+
+    body.dark-mode .desktop-header {
+        background-color: #1e293b;
+        border-bottom: 1px solid #334155;
+    }
+
+    body.dark-mode .desktop-header .user-name,
+    body.dark-mode .desktop-page-title {
+        color: #f1f5f9;
+    }
+
+    body.dark-mode .nav-item {
+        color: #94a3b8;
+    }
+
+    body.dark-mode .nav-item:hover {
+        background: #334155;
+        color: white;
+    }
+
+    body.dark-mode .nav-item.active {
+        background: rgba(99, 102, 241, 0.2) !important;
+        color: #818cf8 !important;
+        /* Lighter indigo */
+    }
+
+    body.dark-mode .training-row {
+        background: #1e293b !important;
+        border-color: #334155;
+    }
+
+    body.dark-mode .training-row:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    body.dark-mode .training-info h3 {
+        color: #f1f5f9;
+    }
+
+    body.dark-mode .training-info p {
+        color: #94a3b8;
+    }
+
+    /* Sidebar Dark */
+    body.dark-mode .bottom-nav {
+        background: #1e293b !important;
+        border-left: 1px solid #334155;
+    }
+
+    /* Menu Button */
+    body.dark-mode #desktop-menu-btn {
+        background: #1e293b;
+        border-color: #334155;
+        color: #f1f5f9;
+    }
+
+    body.dark-mode #desktop-menu-btn:hover {
+        background: var(--app-primary);
+        color: white;
     }
 }

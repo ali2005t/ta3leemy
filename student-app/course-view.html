@@ -123,17 +123,51 @@
             color: var(--text-secondary) !important;
         }
     </style>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script></head>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+</head>
 
 <body>
 
+    <style>
+        .back-btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #1e293b;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            /* For anchor tags */
+        }
+
+        .back-btn-circle:hover {
+            background: #e2e8f0;
+            transform: translateX(3px);
+        }
+
+        /* Dark mode adjustment if needed */
+        body:not(.light-theme) .back-btn-circle {
+            background: #334155;
+            color: #f8fafc;
+        }
+
+        body:not(.light-theme) .back-btn-circle:hover {
+            background: #475569;
+        }
+    </style>
+
     <header class="app-header">
         <div class="header-content">
-            <a href="home.html" class="btn-icon"
-                style="text-decoration:none; display:flex; align-items:center; justify-content:center;">
+            <a href="home.html" class="back-btn-circle">
                 <i class="fas fa-arrow-right"></i>
             </a>
-            <span style="font-weight:bold;">المناهج</span>
+            <span style="font-weight:bold; margin-right: 15px;">المناهج</span>
             <a href="notifications.html" class="btn-icon"
                 style="text-decoration:none; display:flex; align-items:center; justify-content:center;">
                 <i class="fas fa-bell"></i>
@@ -293,6 +327,7 @@
     <script type="module" src="../assets/js/context-resolver.js"></script>
     <script type="module" src="../assets/js/theme-loader.js"></script>
     <script type="module" src="../assets/js/global-ui.js"></script>
+    <script type="module" src="../assets/js/student-common.js"></script>
     <script type="module" src="../assets/js/student-course-view.js"></script>
     <!-- PDF Viewer Modal -->
     <div id="pdf-modal" class="pdf-modal" style="display: none;">

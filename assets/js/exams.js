@@ -11,7 +11,8 @@ import {
     deleteDoc,
     updateDoc,
     getDoc,
-    orderBy
+    orderBy,
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -56,49 +57,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadExams(uid) {
         try {
-            // Using 'exams' collection
             const q = query(
                 collection(db, "exams"),
                 where("teacherId", "==", uid)
             );
-            const snapshot = await getDocs(q);
 
-            tableBody.innerHTML = '';
-            loadingIndicator.style.display = 'none';
-            examsData = [];
+            // Realtime Listener
+            onSnapshot(q, async (snapshot) => {
+                tableBody.innerHTML = '';
+                loadingIndicator.style.display = 'none';
+                examsData = [];
 
-            if (snapshot.empty) {
-                emptyState.style.display = 'block';
-                return;
-            }
+                if (snapshot.empty) {
+                    emptyState.style.display = 'block';
+                    return;
+                } else {
+                    emptyState.style.display = 'none';
+                }
 
-            snapshot.forEach(doc => {
-                examsData.push({ id: doc.id, ...doc.data() });
+                snapshot.forEach(doc => {
+                    examsData.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Fetch Training Titles... (Existing logic - moved inside listener)
+                // Note: In strict realtime, we might want to cache this or use a separate listener for titles.
+                // For now, doing it here is okay as long as edits don't spam.
+                const trainingIds = [...new Set(examsData.map(e => e.trainingId).filter(Boolean))];
+                const trainingMap = {};
+                if (trainingIds.length > 0) {
+                    await Promise.all(trainingIds.map(async (tid) => {
+                        try {
+                            // Check cache or fetch
+                            const tSnap = await getDoc(doc(db, "training_programs", tid));
+                            if (tSnap.exists()) trainingMap[tid] = tSnap.data().title;
+                        } catch (e) { }
+                    }));
+                }
+
+                // Client Sort Descending CreatedAt
+                examsData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                let index = 1;
+                for (const data of examsData) {
+                    data.trainingTitle = trainingMap[data.trainingId] || data.trainingId;
+                    data.displayTeacherName = currentTeacherName;
+                    await renderRow(data, index++);
+                }
+
+            }, (error) => {
+                console.error(error);
+                loadingIndicator.innerText = "خطأ في الاتصال";
             });
-
-            // Fetch Training Titles... (Existing logic)
-            const trainingIds = [...new Set(examsData.map(e => e.trainingId).filter(Boolean))];
-            const trainingMap = {};
-            if (trainingIds.length > 0) {
-                await Promise.all(trainingIds.map(async (tid) => {
-                    try {
-                        const tSnap = await getDoc(doc(db, "training_programs", tid));
-                        if (tSnap.exists()) trainingMap[tid] = tSnap.data().title;
-                    } catch (e) { }
-                }));
-            }
-
-            // Client Sort Descending CreatedAt
-            examsData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-
-            let index = 1;
-            for (const data of examsData) {
-                data.trainingTitle = trainingMap[data.trainingId] || data.trainingId;
-                // Use fetched currentTeacherName if data.teacherName is default or missing
-                // Or just always use currentTeacherName since this is Teacher Panel
-                data.displayTeacherName = currentTeacherName;
-                await renderRow(data, index++);
-            }
 
         } catch (e) {
             console.error(e);
@@ -169,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirmed) {
                 try {
                     await deleteDoc(doc(db, "exams", data.id));
-                    await loadExams(currentUser.uid);
+                    // await loadExams(currentUser.uid); // auto
                     UIManager.showToast("تم الحذف بنجاح");
                 } catch (e) { UIManager.showToast("خطأ: " + e.message, "error"); }
             }

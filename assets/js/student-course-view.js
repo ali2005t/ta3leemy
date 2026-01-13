@@ -149,6 +149,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         .locked-overlay { opacity: 0.6; pointer-events: none; }
         .locked-icon { color: #cbd5e1; }
+
+        /* Desktop Adjustments for Sticky Header */
+        @media (min-width: 1024px) {
+            .custom-tabs {
+                top: 75px !important; /* Below the 70px Fixed Header */
+                border-radius: 0 0 16px 16px; /* Optional styling */
+                z-index: 1900 !important; /* Below Header (2000) but above content */
+            }
+        }
     `;
     document.head.appendChild(style);
 

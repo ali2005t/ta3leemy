@@ -12,8 +12,10 @@ import {
     serverTimestamp,
     getDoc,
     doc,
-    deleteDoc
+    deleteDoc,
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { UIManager } from './ui-manager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // ... (unchanged setup) ...
@@ -54,44 +56,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 where("teacherId", "==", uid)
             );
 
-            const querySnapshot = await getDocs(q);
+            // Realtime Listener
+            onSnapshot(q, (querySnapshot) => {
+                tableBody.innerHTML = '';
+                trainingsData = [];
+                loadingIndicator.style.display = 'none';
 
-            tableBody.innerHTML = '';
-            trainingsData = [];
+                if (querySnapshot.empty) {
+                    emptyState.style.display = 'block';
+                    return;
+                } else {
+                    emptyState.style.display = 'none';
+                }
 
-            loadingIndicator.style.display = 'none';
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    data.id = docSnap.id;
+                    data.teacherName = teacherName;
+                    trainingsData.push(data);
+                });
 
-            if (querySnapshot.empty) {
-                emptyState.style.display = 'block';
-                return;
-            }
+                // Sort: Order ASC, then Newest First
+                trainingsData.sort((a, b) => {
+                    const orderA = typeof a.order === 'number' ? a.order : 999;
+                    const orderB = typeof b.order === 'number' ? b.order : 999;
+                    if (orderA !== orderB) return orderA - orderB;
+                    const dateA = a.createdAt ? a.createdAt.toMillis() : 0;
+                    const dateB = b.createdAt ? b.createdAt.toMillis() : 0;
+                    return dateB - dateA;
+                });
 
-            querySnapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                data.id = docSnap.id;
-                data.teacherName = teacherName;
-                trainingsData.push(data);
-            });
+                renderList(trainingsData);
 
-            // Sort: Order ASC, then Newest First
-            trainingsData.sort((a, b) => {
-                const orderA = typeof a.order === 'number' ? a.order : 999;
-                const orderB = typeof b.order === 'number' ? b.order : 999;
-                if (orderA !== orderB) return orderA - orderB;
-                const dateA = a.createdAt ? a.createdAt.toMillis() : 0;
-                const dateB = b.createdAt ? b.createdAt.toMillis() : 0;
-                return dateB - dateA;
-            });
-
-            let index = 1;
-            trainingsData.forEach((data) => {
-                renderRow(data, index++);
+            }, (error) => {
+                console.error("Realtime Error:", error);
+                loadingIndicator.innerText = "حدث خطأ في الاتصال";
             });
 
         } catch (error) {
-            console.error("Error loading trainings:", error);
+            console.error("Error setting up listener:", error);
             loadingIndicator.innerText = "حدث خطأ في تحميل البيانات";
         }
+    }
+
+    function renderList(list) {
+        tableBody.innerHTML = '';
+        let index = 1;
+        list.forEach((data) => {
+            renderRow(data, index++);
+        });
     }
 
     function renderRow(data, index) {
@@ -159,8 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         await deleteDoc(doc(db, "training_programs", data.id));
                         UIManager.showToast("تم الحذف بنجاح", "success");
                         // Remove from UI
-                        const tr = btn.closest('tr');
-                        tr.remove();
+                        // const tr = btn.closest('tr'); // Handled by onSnapshot
+                        // tr.remove();
                     } catch (e) {
                         console.error(e);
                         UIManager.showToast("خطأ في الحذف: " + e.message, "error");
@@ -176,15 +189,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
-            tableBody.innerHTML = '';
-            let index = 1;
-
             const filtered = trainingsData.filter(t => t.title.toLowerCase().includes(term));
 
             if (filtered.length > 0) {
-                filtered.forEach(data => renderRow(data, index++));
+                renderList(filtered);
                 emptyState.style.display = 'none';
             } else {
+                tableBody.innerHTML = '';
                 emptyState.style.display = 'block';
                 emptyState.innerText = "لا توجد نتائج مطابقة";
             }

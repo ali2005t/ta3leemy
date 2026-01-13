@@ -9,7 +9,8 @@ import {
     getDoc,
     updateDoc,
     deleteDoc,
-    doc
+    doc,
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingIndicator = document.getElementById('loading-indicator');
     const emptyState = document.getElementById('empty-state');
     const searchInput = document.getElementById('search-courses');
+    if (searchInput) searchInput.addEventListener('input', applyFilter);
 
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.action-dropdown')) {
@@ -28,57 +30,73 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const uid = await getEffectiveUserUid(user);
-            await loadAllCourses(uid);
+            await subscribeCourses(uid);
+            await subscribeCourses(uid);
         } else {
             window.location.href = '../auth/login.html';
         }
     });
 
     let allCourses = [];
+    let trainingMap = {};
 
-    async function loadAllCourses(uid) {
+    async function subscribeCourses(uid) {
         try {
+            // 1. Pre-load Training Map (Metadata)
+            const trainingsSnap = await getDocs(query(collection(db, "training_programs"), where("teacherId", "==", uid)));
+            trainingsSnap.forEach(t => trainingMap[t.id] = t.data().title);
+
+            // 2. Realtime Listener
             const q = query(
                 collection(db, "courses"),
                 where("teacherId", "==", uid)
-                // orderBy("createdAt", "desc") // Needs index
+                // orderBy("createdAt", "desc") 
             );
 
-            const snapshot = await getDocs(q);
+            onSnapshot(q, (snapshot) => {
+                allCourses = [];
+                if (snapshot.empty) {
+                    renderList([]);
+                    return;
+                }
 
-            if (snapshot.empty) {
-                loadingIndicator.style.display = 'none';
-                emptyState.style.display = 'block';
-                return;
-            }
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    data.id = docSnap.id;
+                    data.trainingTitle = trainingMap[data.trainingId] || "-";
+                    allCourses.push(data);
+                });
 
-            // Fetch Training Names (Optimization: map ID -> Name)
-            // For now, simpler to just fetch course data, and maybe Training Name if lazy loaded or stored in course doc
-            // Assuming we don't have trainingName in course doc, we might need to fetch it.
-            // PRO TIP: In NoSQL, denormalize 'trainingTitle' into the course document to avoid N+1 queries.
-            // Since I didn't do that in create-course.js, I will do a quick lookup or just show ID.
+                applyFilter();
 
-            // To be efficient, let's fetch all trainings of this teacher once
-            const trainingsSnap = await getDocs(query(collection(db, "training_programs"), where("teacherId", "==", uid)));
-            const trainingMap = {};
-            trainingsSnap.forEach(t => trainingMap[t.id] = t.data().title);
-
-            allCourses = [];
-            let index = 1;
-
-            snapshot.forEach(docSnap => {
-                const data = docSnap.data();
-                data.id = docSnap.id;
-                data.trainingTitle = trainingMap[data.trainingId] || "-";
-                allCourses.push(data);
-                renderRow(data, index++);
+            }, (error) => {
+                console.error("Realtime Error:", error);
+                loadingIndicator.innerText = "خطأ في الاتصال";
             });
-
-            loadingIndicator.style.display = 'none';
 
         } catch (error) {
             console.error(error);
             loadingIndicator.innerText = "Error loading courses";
+        }
+    }
+
+    function applyFilter() {
+        const term = searchInput ? searchInput.value.toLowerCase() : '';
+        const filtered = allCourses.filter(c => c.title.toLowerCase().includes(term));
+        renderList(filtered);
+    }
+
+    function renderList(list) {
+        loadingIndicator.style.display = 'none';
+        tableBody.innerHTML = '';
+
+        if (list.length === 0) {
+            emptyState.style.display = 'block';
+        } else {
+            emptyState.style.display = 'none';
+            list.forEach((data, index) => {
+                renderRow(data, index + 1);
+            });
         }
     }
 
@@ -148,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     await deleteDoc(doc(db, "courses", data.id));
                     // Ideally delete sub-lectures too (needs cloud function or batch)
                     alert("تم الحذف بنجاح");
-                    window.location.reload();
+                    // window.location.reload(); // Live update handles it
                 } catch (e) {
                     alert("خطأ في الحذف: " + e.message);
                 }

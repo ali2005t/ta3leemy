@@ -66,7 +66,13 @@
                         <input type="password" id="password" class="form-input" placeholder="••••••••" required>
                         <i class="fas fa-eye password-toggle" id="toggle-password"></i>
                     </div>
-                    <div style="text-align: left; margin-top: 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        <label
+                            style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #64748b; font-size: 0.9rem;">
+                            <input type="checkbox" id="remember-me"
+                                style="width: 16px; height: 16px; cursor: pointer; accent-color: #6366f1;">
+                            <span>تذكرني</span>
+                        </label>
                         <a href="forgot-password.html"
                             style="font-size: 0.85rem; color: #6366f1; text-decoration: none;">نسيت كلمة المرور؟</a>
                     </div>
@@ -84,6 +90,7 @@
         </div>
 
         <script type="module" src="../assets/js/firebase-config.js"></script>
+        <script type="module" src="../assets/js/check-maintenance.js"></script>
         <script type="module" src="../assets/js/login.js"></script>
         <script>
             // Login Mode Switcher
