@@ -69,7 +69,9 @@ class BuilderLogic:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 shell=True,
-                text=True
+                text=True,
+                encoding="utf-8",
+                errors="replace"
             )
             
             # Read output in real-time
