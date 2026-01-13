@@ -18,7 +18,8 @@
 **ملخص سريع:**
 1.  عدل الإعدادات في `lib/config.dart`.
 2.  قم بتغيير اللوجو والاسم.
-3.  استخدم الأمر: `flutter build apk --release`.
+3.  استخدم الأمر: `flutter build apk --release` (للتجربة).
+4.  أو الأمر: `flutter build appbundle --release` (لمتجر جوجل بلاي).
 
 ---
 

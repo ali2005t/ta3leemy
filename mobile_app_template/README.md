@@ -44,15 +44,23 @@
    flutter clean
    flutter pub get
    ```
-3. قم ببناء ملف APK:
+3. قم ببناء ملف APK (للتجربة والنشر المباشر):
    ```bash
    flutter build apk --release
    ```
 
+4. **للنشر على متجر Google Play (مهم جداً!)**:
+   المتجر لا يقبل APK، بل يطلب ملف بصيغة `.aab`. لاستخراجه استخدم الأمر:
+   ```bash
+   flutter build appbundle --release
+   ```
+
+   ℹ️ **ملاحظة هامة**: لرفع التطبيق على المتجر، ستحتاج لإنشاء "مفتاح توقيع" (Keystore). هذا موضوع تقني قليلاً، لكن الأمر أعلاه سينتج لك الملف المبدئي.
+
 ⏳ **انتظر قليلاً...** سيقوم الكمبيوتر بتحميل المكتبات وبناء التطبيق.
 
-✅ **أين أجد الملف؟**
-بعد انتهاء العملية، ستجد ملف التطبيق الجاهز في المسار:
-`build/app/outputs/flutter-apk/app-release.apk`
+✅ **أين أجد الملفات؟**
+- ملف **APK**: `build/app/outputs/flutter-apk/app-release.apk`
+- ملف **AAB** (للمتجر): `build/app/outputs/bundle/release/app-release.aab`
 
-يمكنك إرسال هذا الملف للمدرسين أو الطلاب لتثبيته فوراً!
+يمكنك إرسال ملف APK للمدرسين مباشرة، أما AAB فهو مخصص للرفع على Google Play Console.
