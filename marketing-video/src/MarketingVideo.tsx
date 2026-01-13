@@ -8,49 +8,69 @@ import { Security } from './Scenes/Security';
 import { SuccessMoment } from './Scenes/SuccessMoment';
 import { CTA } from './Scenes/CTA';
 
+// Batch 1: Teacher Control
+import { Dashboard } from './Scenes/Dashboard';
+import { CodeGen } from './Scenes/CodeGen';
+import { Financials } from './Scenes/Financials';
+import { UserPerms } from './Scenes/UserPerms';
+import { CourseMgmt } from './Scenes/CourseMgmt';
+
+// Batch 2: Learning Experience
+import { LivePlayer } from './Scenes/LivePlayer';
+import { VideoPlayer } from './Scenes/VideoPlayer';
+import { PDFViewer } from './Scenes/PDFViewer';
+import { ExamView } from './Scenes/ExamView';
+import { TrainingMode } from './Scenes/TrainingMode';
+
+// Batch 3: System Features
+import { Notifications } from './Scenes/Notifications';
+import { DarkMode } from './Scenes/DarkMode';
+import { Profile } from './Scenes/Profile';
+import { Support } from './Scenes/Support';
+import { MultiPlatform } from './Scenes/MultiPlatform';
+
 export const MarketingVideo = () => {
-    // Total Duration: 930 frames (31 seconds)
+    // Total Duration: 1620 frames (54 seconds)
     return (
         <AbsoluteFill style={{ backgroundColor: 'white' }}>
-            {/* 0s -> 3s: Intro */}
+            {/* --- ACT 1: THE HOOK (10s | 300f) --- */}
             <Sequence from={0} durationInFrames={90}>
                 <Intro />
             </Sequence>
-
-            {/* 3s -> 7s: Problem/Solution */}
             <Sequence from={90} durationInFrames={120}>
                 <ProblemSolution />
             </Sequence>
-
-            {/* 7s -> 11s: Live Chat */}
-            <Sequence from={210} durationInFrames={120}>
+            <Sequence from={210} durationInFrames={90}>
                 <LiveChat />
             </Sequence>
 
-            {/* 11s -> 15s: Showcase */}
-            <Sequence from={330} durationInFrames={120}>
-                <Showcase />
-            </Sequence>
+            {/* --- ACT 2: TEACHER TOOLS (10s | 300f) --- */}
+            <Sequence from={300} durationInFrames={60}><Dashboard /></Sequence>
+            <Sequence from={360} durationInFrames={60}><CodeGen /></Sequence>
+            <Sequence from={420} durationInFrames={60}><Financials /></Sequence>
+            <Sequence from={480} durationInFrames={60}><UserPerms /></Sequence>
+            <Sequence from={540} durationInFrames={60}><CourseMgmt /></Sequence>
 
-            {/* 15s -> 19s: Gamification (NEW) */}
-            <Sequence from={450} durationInFrames={120}>
-                <Gamification />
-            </Sequence>
+            {/* --- ACT 3: STUDENT EXPERIENCE (10s | 300f) --- */}
+            <Sequence from={600} durationInFrames={60}><LivePlayer /></Sequence>
+            <Sequence from={660} durationInFrames={60}><VideoPlayer /></Sequence>
+            <Sequence from={720} durationInFrames={60}><PDFViewer /></Sequence>
+            <Sequence from={780} durationInFrames={60}><ExamView /></Sequence>
+            <Sequence from={840} durationInFrames={60}><TrainingMode /></Sequence>
 
-            {/* 19s -> 23s: Security (NEW) */}
-            <Sequence from={570} durationInFrames={120}>
-                <Security />
-            </Sequence>
+            {/* --- ACT 4: SYSTEM FEATURES (10s | 300f) --- */}
+            <Sequence from={900} durationInFrames={60}><Notifications /></Sequence>
+            <Sequence from={960} durationInFrames={60}><DarkMode /></Sequence>
+            <Sequence from={1020} durationInFrames={60}><Profile /></Sequence>
+            <Sequence from={1080} durationInFrames={60}><Support /></Sequence>
+            <Sequence from={1140} durationInFrames={60}><MultiPlatform /></Sequence>
 
-            {/* 23s -> 27s: Success Moment */}
-            <Sequence from={690} durationInFrames={120}>
-                <SuccessMoment />
-            </Sequence>
-
-            {/* 27s -> 31s: CTA */}
-            <Sequence from={810} durationInFrames={120}>
-                <CTA />
-            </Sequence>
+            {/* --- ACT 5: THE CLIMAX (14s | 420f) --- */}
+            <Sequence from={1200} durationInFrames={90}><Showcase /></Sequence>
+            <Sequence from={1290} durationInFrames={90}><Gamification /></Sequence>
+            <Sequence from={1380} durationInFrames={90}><Security /></Sequence>
+            <Sequence from={1470} durationInFrames={90}><SuccessMoment /></Sequence>
+            <Sequence from={1560} durationInFrames={60}><CTA /></Sequence>
         </AbsoluteFill>
     );
 };
