@@ -3,11 +3,13 @@ import { Intro } from './Scenes/Intro';
 import { ProblemSolution } from './Scenes/ProblemSolution';
 import { LiveChat } from './Scenes/LiveChat';
 import { Showcase } from './Scenes/Showcase';
+import { Gamification } from './Scenes/Gamification';
+import { Security } from './Scenes/Security';
 import { SuccessMoment } from './Scenes/SuccessMoment';
 import { CTA } from './Scenes/CTA';
 
 export const MarketingVideo = () => {
-    // Total Duration: 690 frames
+    // Total Duration: 930 frames (31 seconds)
     return (
         <AbsoluteFill style={{ backgroundColor: 'white' }}>
             {/* 0s -> 3s: Intro */}
@@ -30,13 +32,23 @@ export const MarketingVideo = () => {
                 <Showcase />
             </Sequence>
 
-            {/* 15s -> 19s: Success Moment (NEW) */}
+            {/* 15s -> 19s: Gamification (NEW) */}
             <Sequence from={450} durationInFrames={120}>
+                <Gamification />
+            </Sequence>
+
+            {/* 19s -> 23s: Security (NEW) */}
+            <Sequence from={570} durationInFrames={120}>
+                <Security />
+            </Sequence>
+
+            {/* 23s -> 27s: Success Moment */}
+            <Sequence from={690} durationInFrames={120}>
                 <SuccessMoment />
             </Sequence>
 
-            {/* 19s -> 23s: CTA */}
-            <Sequence from={570} durationInFrames={120}>
+            {/* 27s -> 31s: CTA */}
+            <Sequence from={810} durationInFrames={120}>
                 <CTA />
             </Sequence>
         </AbsoluteFill>
