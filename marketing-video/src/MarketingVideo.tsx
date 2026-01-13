@@ -1,10 +1,13 @@
 import { AbsoluteFill, Sequence } from 'remotion';
 import { Intro } from './Scenes/Intro';
 import { ProblemSolution } from './Scenes/ProblemSolution';
+import { LiveChat } from './Scenes/LiveChat';
 import { Showcase } from './Scenes/Showcase';
+import { SuccessMoment } from './Scenes/SuccessMoment';
 import { CTA } from './Scenes/CTA';
 
 export const MarketingVideo = () => {
+    // Total Duration: 690 frames
     return (
         <AbsoluteFill style={{ backgroundColor: 'white' }}>
             {/* 0s -> 3s: Intro */}
@@ -17,13 +20,23 @@ export const MarketingVideo = () => {
                 <ProblemSolution />
             </Sequence>
 
-            {/* 7s -> 12s: Showcase */}
-            <Sequence from={210} durationInFrames={150}>
+            {/* 7s -> 11s: Live Chat */}
+            <Sequence from={210} durationInFrames={120}>
+                <LiveChat />
+            </Sequence>
+
+            {/* 11s -> 15s: Showcase */}
+            <Sequence from={330} durationInFrames={120}>
                 <Showcase />
             </Sequence>
 
-            {/* 12s -> 15s: CTA */}
-            <Sequence from={360} durationInFrames={90}>
+            {/* 15s -> 19s: Success Moment (NEW) */}
+            <Sequence from={450} durationInFrames={120}>
+                <SuccessMoment />
+            </Sequence>
+
+            {/* 19s -> 23s: CTA */}
+            <Sequence from={570} durationInFrames={120}>
                 <CTA />
             </Sequence>
         </AbsoluteFill>
