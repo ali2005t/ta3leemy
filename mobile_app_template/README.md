@@ -64,3 +64,9 @@
 - ملف **AAB** (للمتجر): `build/app/outputs/bundle/release/app-release.aab`
 
 يمكنك إرسال ملف APK للمدرسين مباشرة، أما AAB فهو مخصص للرفع على Google Play Console.
+
+⚠️ **تجاهل هذا الخطأ إن ظهر لك:**
+قد تظهر لك رسالة باللون الأحمر في النهاية تقول:
+`Release app bundle failed to strip debug symbols from native libraries`
+هذا **ليس خطأ حقيقياً**! هو مجرد تنبيه بأن حجم الملف أكبر قليلاً من المعتاد، ولكنه **سليم 100% وجاهز للرفع على المتجر** ولا يحتاج لأي إصلاح.
+
