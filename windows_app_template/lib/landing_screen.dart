@@ -24,7 +24,7 @@ class _LandingScreenState extends State<LandingScreen> {
       await _controller.initialize();
       
       // 🕵️‍♂️ User Agent مخصص عشان نعرف إنه برنامج كمبيوتر
-      await _controller.setUserAgent("Ta3leemyApp/1.0 (Windows Desktop)");
+      await _controller.setUserAgent("${AppConfig.appName}/1.0 (Windows Desktop)");
       
       await _controller.loadUrl(AppConfig.startUrl);
 
@@ -52,29 +52,72 @@ class _LandingScreenState extends State<LandingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppConfig.appName),
-        backgroundColor: AppConfig.primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 2,
-        actions: [
-            IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () => _controller.reload(),
+      body: Row(
+        children: [
+          // 🏮 القائمة الجانبية (Sidebar)
+          Container(
+            width: 70,
+            color: const Color(0xFF1E293B), // Slate 800
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                // Logo or Icon
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: AppConfig.primaryColor,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: const Icon(Icons.school, color: Colors.white, size: 30),
+                ),
+                const SizedBox(height: 40),
+                
+                // Actions
+                _SideButton(
+                    icon: Icons.home_rounded,
+                    label: "Home",
+                    onTap: () => _controller.loadUrl(AppConfig.startUrl)
+                ),
+                const SizedBox(height: 20),
+                _SideButton(
+                    icon: Icons.refresh_rounded,
+                    label: "Refresh",
+                    onTap: () => _controller.reload()
+                ),
+                const Spacer(),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 20),
+                  child: RotatedBox(
+                    quarterTurns: 3,
+                    child: Text(
+                      "Ta3leemy App",
+                      style: TextStyle(color: Colors.white24, letterSpacing: 2),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            IconButton(
-                icon: const Icon(Icons.home),
-                onPressed: () => _controller.loadUrl(AppConfig.startUrl),
+          ),
+          
+          // 🕸️ مستعرض الموقع (WebView)
+          Expanded(
+            child: Container(
+              color: const Color(0xFF0F172A),
+              child: _isInitialized
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 0), // No padding needed if borderless
+                      child: Webview(
+                          _controller,
+                          permissionRequested: _onPermissionRequested,
+                        ),
+                    )
+                  : Center(
+                      child: CircularProgressIndicator(color: AppConfig.primaryColor),
+                    ),
             ),
+          ),
         ],
-      ),
-      body: Center(
-        child: _isInitialized
-            ? Webview(
-                _controller,
-                permissionRequested: _onPermissionRequested,
-              )
-            : CircularProgressIndicator(color: AppConfig.primaryColor),
       ),
     );
   }
@@ -84,13 +127,14 @@ class _LandingScreenState extends State<LandingScreen> {
     final decision = await showDialog<WebviewPermissionDecision>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('طلب إذن'),
-        content: Text('الموقع يطلب إذن: $kind\nهل توافق؟'),
+        backgroundColor: const Color(0xFF1E293B),
+        title: const Text('طلب إذن', style: TextStyle(color: Colors.white)),
+        content: Text('الموقع يطلب إذن: $kind\nهل توافق؟', style: const TextStyle(color: Colors.white70)),
         actions: <Widget>[
           TextButton(
             onPressed: () =>
                 Navigator.pop(context, WebviewPermissionDecision.deny),
-            child: const Text('رفض'),
+            child: const Text('رفض', style: TextStyle(color: Colors.redAccent)),
           ),
           TextButton(
             onPressed: () =>
@@ -102,5 +146,24 @@ class _LandingScreenState extends State<LandingScreen> {
     );
 
     return decision ?? WebviewPermissionDecision.deny;
+  }
+}
+
+class _SideButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _SideButton({required this.icon, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(icon, color: Colors.white70),
+      tooltip: label,
+      onPressed: onTap,
+      hoverColor: Colors.white10,
+      splashRadius: 25,
+    );
   }
 }

@@ -90,13 +90,13 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.ta3leemy" "\0"
-            VALUE "FileDescription", "ta3leemy_windows_app" "\0"
-            VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "ta3leemy_windows_app" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.ta3leemy. All rights reserved." "\0"
-            VALUE "OriginalFilename", "ta3leemy_windows_app.exe" "\0"
-            VALUE "ProductName", "ta3leemy_windows_app" "\0"
-            VALUE "ProductVersion", VERSION_AS_STRING "\0"
+            VALUE "FileDescription", "sera" "\0"
+            VALUE "FileVersion", "1.0.0.1" "\0"
+            VALUE "InternalName", "sera" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.ta3leemy.sera. All rights reserved." "\0"
+            VALUE "OriginalFilename", "sera.exe" "\0"
+            VALUE "ProductName", "sera" "\0"
+            VALUE "ProductVersion", "1.0.0.1" "\0"
         END
     END
     BLOCK "VarFileInfo"

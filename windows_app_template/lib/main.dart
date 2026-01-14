@@ -19,6 +19,7 @@ void main() async {
   );
   
   windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.setTitle(AppConfig.appName);
     await windowManager.show();
     await windowManager.focus();
   });
@@ -34,9 +35,24 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: AppConfig.appName,
+      themeMode: ThemeMode.dark,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppConfig.primaryColor),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: AppConfig.primaryColor),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF0F172A), // Slate 900
+        appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF1E293B), // Slate 800
+            elevation: 0,
+        ),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: AppConfig.primaryColor,
+            brightness: Brightness.dark,
+            background: const Color(0xFF0F172A),
+        ),
       ),
       home: const LandingScreen(),
     );
